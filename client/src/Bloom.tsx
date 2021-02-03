@@ -71,7 +71,7 @@ export const Bloom: React.FC<{ onClick: (args: WsArgs) => void }> = ({
   });
 
   const playNote = (click: ClickHistory) => {
-    const freq = rangeMap(click.x, 0, BOARD_WIDTH, 20, 5000);
+    const freq = rangeMap(click.x, 0, BOARD_WIDTH, 20, 2000);
     const vol = rangeMap(click.y, 0, BOARD_HEIGHT, 0, 1);
     console.log("Playing note ", freq, vol);
 
