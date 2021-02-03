@@ -1,0 +1,17 @@
+{
+  "name": "osc-controller-server",
+  "version": "1.0.0",
+  "description": "Server for controlling osc app",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "osc": "^2.4.1",
+    "ws": "^7.4.3"
+  },
+  "devDependencies": {
+    "prettier": "^2.2.1"
+  }
+}

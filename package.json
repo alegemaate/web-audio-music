@@ -1,0 +1,13 @@
+{
+  "name": "osc-controller",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start:server": "cd server && yarn start",
+    "start:client": "cd client && yarn start"
+  }
+}
