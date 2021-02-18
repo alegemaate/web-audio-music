@@ -1,53 +1,116 @@
 import React from "react";
+import { Router } from "@reach/router";
+import { Box, Container, makeStyles } from "@material-ui/core";
 
-import osc from "osc";
+import "fontsource-roboto";
+import "./libs/fulltilt";
 
+import { ConnectForm } from "./ConnectForm";
 import { Bloom } from "./Bloom";
-console.log(osc);
+import { Accelerometer } from "./Accelerometer";
+import { Dashboard } from "./Dashboard";
+import { AppDrawer } from "./AppDrawer";
+import { AppTopBar } from "./AppTopBar";
 
 export type WsArgs = {
   address: string;
   args: (number | string)[];
 };
 
-function App() {
-  const [port, setPort] = React.useState<any>(null);
+const useStyles = makeStyles(() => ({
+  root: {
+    flexGrow: 1,
+  },
+}));
 
-  React.useEffect(() => {
-    const port = new osc.WebSocketPort({
-      url: "ws://localhost:8081",
-    });
+const App: React.FC = () => {
+  const [client, setClient] = React.useState<WebSocket | null>(null);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState("");
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
 
-    if (port) {
-      port.on("message", function (oscMessage: any) {
-        console.log(oscMessage);
-        console.log("message", oscMessage);
-      });
+  const classes = useStyles();
 
-      port.open();
+  const toggleDrawer = () => {
+    setDrawerOpen((open) => !open);
+  };
 
-      setPort(port);
+  const handleDisconnect = () => {
+    if (client) {
+      client.close();
     }
-  }, []);
-  const playNote = (args: WsArgs) => {
-    console.log("Playing note ", args);
+    setClient(null);
+  };
 
-    try {
-      if (port) {
-        port.send(args);
+  const connectWebsocket = (url: string) => {
+    setLoading(true);
+    setError("");
+
+    if (!/^wss:[\w]*\/\/./u.exec(url)) {
+      setError("Invalid wss string");
+      setLoading(false);
+      return;
+    }
+
+    const ws = new WebSocket(url);
+
+    ws.onopen = (connection) => {
+      console.log("WebSocket Client Connected", connection);
+      setLoading(false);
+      setClient(ws);
+      window.localStorage.setItem("wssurl", url);
+    };
+
+    ws.onerror = (error) => {
+      console.log("Connection Error: ", error);
+      setLoading(false);
+      setError("Connection failed");
+    };
+
+    ws.onclose = () => {
+      console.log("Connection Closed");
+      handleDisconnect();
+    };
+
+    ws.onmessage = (message) => {
+      if (message.type === "utf8") {
+        console.log("Received: '" + message.data + "'");
       }
-    } catch (e) {
-      console.log(e);
+    };
+  };
+
+  const playNote = (args: WsArgs) => {
+    if (client) {
+      console.log("Playing note ", args);
+      client.send(JSON.stringify(args));
     }
   };
 
   return (
-    <div className="App">
-      <p>Controllers</p>
-
-      <Bloom onClick={playNote} />
+    <div className={classes.root} style={{ userSelect: "none" }}>
+      <AppTopBar
+        onDisconnect={handleDisconnect}
+        toggleDrawer={toggleDrawer}
+        url={client?.url}
+      />
+      <AppDrawer open={drawerOpen} toggle={toggleDrawer} />
+      <ConnectForm
+        loading={loading}
+        onSubmit={connectWebsocket}
+        open={!client}
+        error={error}
+      />
+      <Container maxWidth="md">
+        <Box maxWidth="md" mt={4}>
+          <Router>
+            <Dashboard path="/" />
+            <Bloom path="/bloom" onTransmit={playNote} />
+            <Accelerometer path="/accel" onTransmit={playNote} />
+          </Router>
+        </Box>
+      </Container>
     </div>
   );
-}
+};
 
 export default App;

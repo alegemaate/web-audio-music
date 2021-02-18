@@ -1,17 +1,15 @@
+import {
+  Button,
+  Card,
+  CardActions,
+  Slider,
+  Typography,
+} from "@material-ui/core";
+import { Timelapse, Timer } from "@material-ui/icons";
+import { RouteComponentProps } from "@reach/router";
 import React from "react";
 import { WsArgs } from "./App";
-
-const TIMER_LOOP = 3;
-const BOARD_WIDTH = 1900;
-const BOARD_HEIGHT = 800;
-
-const rangeMap = (
-  value: number,
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number
-) => ((value - x1) * (y2 - x2)) / (y1 - x1) + x2;
+import { rangeMap } from "./helpers";
 
 export type ClickHistory = {
   x: number;
@@ -20,25 +18,27 @@ export type ClickHistory = {
   index: number;
 };
 
-const ClickDot: React.FC<{ click: ClickHistory; timer: number }> = ({
-  click,
-  timer,
-}) => {
+const ClickDot: React.FC<{
+  click: ClickHistory;
+  timer: number;
+  boardWidth: number;
+  maxTime: number;
+}> = ({ click, timer, boardWidth, maxTime }) => {
   let timerDiff =
-    (Math.sin(((timer - click.time) / (TIMER_LOOP / 2) + 0.5) * Math.PI) + 1) *
+    (Math.sin(((timer - click.time) / (maxTime / 2) + 0.5) * Math.PI) + 1) *
     0.5;
 
   return (
     <div
       style={{
-        width: (timerDiff * BOARD_WIDTH) / 3,
-        height: (timerDiff * BOARD_WIDTH) / 3,
+        width: (timerDiff * boardWidth) / 3,
+        height: (timerDiff * boardWidth) / 3,
         backgroundColor: `rgba(0,${click.x / 2},${click.y / 2},${
           timerDiff / 2
         })`,
         position: "absolute",
-        top: click.y - (timerDiff * BOARD_WIDTH) / 6,
-        left: click.x - (timerDiff * BOARD_WIDTH) / 6,
+        top: click.y - (timerDiff * boardWidth) / 6,
+        left: click.x - (timerDiff * boardWidth) / 6,
         borderRadius: "50%",
         transition: "all 0.5s",
       }}
@@ -46,17 +46,34 @@ const ClickDot: React.FC<{ click: ClickHistory; timer: number }> = ({
   );
 };
 
-export const Bloom: React.FC<{ onClick: (args: WsArgs) => void }> = ({
-  onClick,
-}) => {
+export const Bloom: React.FC<
+  RouteComponentProps & { onTransmit: (args: WsArgs) => void }
+> = ({ onTransmit }) => {
   const [clickHistory, setClickHistory] = React.useState<ClickHistory[]>([]);
   const [timer, setTimer] = React.useState(0);
+  const [size, setSize] = React.useState({ width: 0, height: 0 });
+  const [maxTime, setMaxTime] = React.useState(4);
+
   const boardRef = React.useRef<HTMLDivElement>(null);
 
+  const playNote = React.useCallback(
+    (click: ClickHistory) => {
+      const freq = rangeMap(click.x, 0, size.width, 20, 2000);
+      const vol = rangeMap(click.y, 0, size.height, 0, 1);
+      console.log("Playing note ", freq, vol);
+
+      onTransmit({
+        address: "/chuck/oscnote",
+        args: [freq, vol, click.index],
+      });
+    },
+    [onTransmit, size]
+  );
+
   React.useEffect(() => {
-    const interval = setInterval(function () {
+    const interval = setInterval(() => {
       let newTime = timer + 0.1;
-      if (newTime > TIMER_LOOP) {
+      if (newTime > maxTime) {
         newTime = 0;
       }
 
@@ -68,32 +85,31 @@ export const Bloom: React.FC<{ onClick: (args: WsArgs) => void }> = ({
     }, 100);
 
     return () => clearInterval(interval);
-  });
+  }, [playNote, clickHistory, timer, maxTime]);
 
-  const playNote = (click: ClickHistory) => {
-    const freq = rangeMap(click.x, 0, BOARD_WIDTH, 20, 2000);
-    const vol = rangeMap(click.y, 0, BOARD_HEIGHT, 0, 1);
-    console.log("Playing note ", freq, vol);
-
-    onClick({
-      address: "/chuck/oscnote",
-      args: [freq, vol, click.index],
-    });
-  };
+  React.useEffect(() => {
+    if (boardRef.current) {
+      setSize({
+        width: boardRef.current.clientWidth,
+        height: boardRef.current.clientHeight,
+      });
+    }
+  }, [boardRef]);
 
   const mouseMoved = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const { nativeEvent } = event;
     const x = nativeEvent.offsetX;
     const y = nativeEvent.offsetY;
     console.log(x, y);
+
     if (boardRef.current) {
       boardRef.current.style.backgroundColor = `rgba(0, ${rangeMap(
         x,
         0,
-        BOARD_WIDTH,
+        size.width,
         0,
         255
-      )}, ${rangeMap(y, 0, BOARD_HEIGHT, 0, 255)})`;
+      )}, ${rangeMap(y, 0, size.height, 0, 255)})`;
     }
   };
 
@@ -119,21 +135,32 @@ export const Bloom: React.FC<{ onClick: (args: WsArgs) => void }> = ({
     setClickHistory([]);
   };
 
+  const handleMaxTimeChange = (_event: unknown, value: number | number[]) => {
+    if (typeof value === "number") {
+      setMaxTime(value);
+    }
+  };
+
   return (
-    <>
+    <Card>
       <div
         ref={boardRef}
         style={{
-          width: BOARD_WIDTH,
-          height: BOARD_HEIGHT,
+          width: "100%",
+          height: 400,
           position: "relative",
           overflow: "hidden",
           transition: "background-color 0.5s",
-          filter: "blur(2px)",
         }}
       >
         {clickHistory.map((click) => (
-          <ClickDot key={click.index} click={click} timer={timer} />
+          <ClickDot
+            key={click.index}
+            click={click}
+            timer={timer}
+            boardWidth={size.width}
+            maxTime={maxTime}
+          />
         ))}
         <div
           style={{
@@ -148,8 +175,21 @@ export const Bloom: React.FC<{ onClick: (args: WsArgs) => void }> = ({
           onClick={mouseClicked}
         />
       </div>
-      <p>Time: {Math.round(timer * 100) / 100}</p>
-      <button onClick={clearHistory}>Clear</button>
-    </>
+      <CardActions>
+        <Timer />
+        <Typography variant="body1" style={{ width: "100%" }}>
+          {Math.round(timer * 100) / 100}/{Math.round(maxTime * 100) / 100}
+        </Typography>
+        <Timelapse />
+        <Slider
+          value={maxTime}
+          onChange={handleMaxTimeChange}
+          max={20}
+          min={1}
+          step={0.1}
+        />
+        <Button onClick={clearHistory}>Clear</Button>
+      </CardActions>
+    </Card>
   );
 };
