@@ -4,26 +4,9 @@
 const osc = require("osc");
 const WebSocket = require("ws");
 
-const getIPAddresses = function () {
-  const os = require("os"),
-    interfaces = os.networkInterfaces(),
-    ipAddresses = [];
+const WS_PORT = 8080;
 
-  for (let deviceName in interfaces) {
-    const addresses = interfaces[deviceName];
-
-    for (let i = 0; i < addresses.length; i++) {
-      const addressInfo = addresses[i];
-
-      if (addressInfo.family === "IPv4" && !addressInfo.internal) {
-        ipAddresses.push(addressInfo.address);
-      }
-    }
-  }
-
-  return ipAddresses;
-};
-
+// Create UDP Server
 const udp = new osc.UDPPort({
   localAddress: "0.0.0.0",
   localPort: 7400,
@@ -31,32 +14,44 @@ const udp = new osc.UDPPort({
   remotePort: 7500,
 });
 
+// Tell us when ready
 udp.on("ready", function () {
-  const ipAddresses = getIPAddresses();
-  console.log("Listening for OSC over UDP.");
-  ipAddresses.forEach(function (address) {
-    console.log(" Host:", address + ", Port:", udp.options.localPort);
-  });
-  console.log(
-    "Broadcasting OSC over UDP to",
-    udp.options.remoteAddress + ", Port:",
-    udp.options.remotePort
-  );
+  console.log("UDP Ready");
 });
 
+// Open udp port
 udp.open();
 
+// Create websocket server
 const wss = new WebSocket.Server({
-  port: 8081,
+  port: WS_PORT,
 });
 
-wss.on("connection", function (socket) {
-  console.log("A Web Socket connection has been established!");
-  const socketPort = new osc.WebSocketPort({
-    socket,
-  });
+// On ready
+wss.on("listening", () => {
+  console.log(`Web socket listening on port ${WS_PORT}`);
+});
 
-  new osc.Relay(udp, socketPort, {
-    raw: true,
+// New websocket connection
+wss.on("connection", (socket) => {
+  console.log("A Web Socket connection has been established!");
+
+  // Relay to UDP
+  socket.on("message", (message) => {
+    const msg = JSON.parse(message);
+    if (
+      msg instanceof Object &&
+      msg.args instanceof Array &&
+      typeof msg.address === "string"
+    ) {
+      udp.send(msg);
+    } else {
+      console.log("An invalid message was sent ", msg);
+    }
   });
+});
+
+// Connection closed
+wss.on("close", () => {
+  console.log("A Web Socket connection has been closed!");
 });

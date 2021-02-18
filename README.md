@@ -11,3 +11,7 @@ Simply run `yarn`
 You will need to run both the client and server. In two separate terminals run:
 `yarn start:server`
 `yarn start:client`
+
+## Remote development, use ngrok
+
+`ngrok http localhost:8080`
