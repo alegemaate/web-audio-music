@@ -2,9 +2,6 @@ import React from "react";
 import { Router } from "@reach/router";
 import { Box, Container, makeStyles } from "@material-ui/core";
 
-import "fontsource-roboto";
-import "./libs/fulltilt";
-
 import { ConnectForm } from "./ConnectForm";
 import { Bloom } from "./Bloom";
 import { Accelerometer } from "./Accelerometer";
