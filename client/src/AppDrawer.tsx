@@ -8,18 +8,13 @@ import {
   ListItem,
   List,
 } from "@material-ui/core";
-import { Equalizer, Home } from "@material-ui/icons";
+
+import { MODULES } from "./modules";
 
 export type WsArgs = {
   address: string;
   args: (number | string)[];
 };
-
-const listItems = [
-  { name: "Home", link: "/", icon: <Home /> },
-  { name: "Bloom", link: "/bloom", icon: <Equalizer /> },
-  { name: "Accel", link: "/accel", icon: <Equalizer /> },
-];
 
 const useStyles = makeStyles((theme) => ({
   list: {
@@ -42,7 +37,7 @@ export const AppDrawer: React.FC<{ open: boolean; toggle: () => void }> = ({
         onKeyDown={toggle}
       >
         <List>
-          {listItems.map((item) => (
+          {MODULES.map((item) => (
             <Link
               key={item.link}
               to={item.link}

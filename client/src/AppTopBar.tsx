@@ -62,7 +62,7 @@ export const AppTopBar: React.FC<{
           <MenuIcon />
         </IconButton>
         <Link
-          to="/"
+          to="/osc-controller/"
           className={classes.title}
           style={{ textDecoration: "none", color: "white" }}
         >

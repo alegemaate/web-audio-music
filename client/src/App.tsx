@@ -8,6 +8,7 @@ import { Accelerometer } from "./Accelerometer";
 import { Dashboard } from "./Dashboard";
 import { AppDrawer } from "./AppDrawer";
 import { AppTopBar } from "./AppTopBar";
+import { FmSynth } from "./FmSynth";
 
 export type WsArgs = {
   address: string;
@@ -99,10 +100,11 @@ const App: React.FC = () => {
       />
       <Container maxWidth="md">
         <Box maxWidth="md" mt={4}>
-          <Router>
+          <Router basepath="/osc-controller">
             <Dashboard path="/" />
             <Bloom path="/bloom" onTransmit={playNote} />
             <Accelerometer path="/accel" onTransmit={playNote} />
+            <FmSynth path="/fmsynth" />
           </Router>
         </Box>
       </Container>
