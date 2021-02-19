@@ -13,8 +13,9 @@ export type AccelParams = {
 };
 
 export const AccelPad: React.FC<{
-  onChange: (args: AccelParams) => void;
-}> = ({ onChange }) => {
+  onChange?: (args: AccelParams) => void;
+  onClick?: (status: "on" | "off") => void;
+}> = ({ onChange, onClick }) => {
   const [hasMotionDevice, setHasMotionDevice] = React.useState(false);
   const [error, setError] = React.useState("");
   const [size, setSize] = React.useState({ width: 0, height: 0 });
@@ -31,52 +32,56 @@ export const AccelPad: React.FC<{
     }
   }, [boardRef]);
 
-  const motionAccess = () => {
+  const initMotion = () => {
+    setHasMotionDevice(true);
     const gn = new GyroNorm();
 
+    gn.init({ frequency: 50 })
+      .then(() => {
+        gn.start((data) => {
+          if (dotRef.current) {
+            const { alpha, beta, gamma } = data.do;
+
+            dotRef.current.style.left = `${
+              rangeMap(gamma, -90, 90, 0, size.width) - DOT_SIZE / 2
+            }px`;
+
+            dotRef.current.style.top = `${
+              rangeMap(beta, -90, 90, 0, size.height) - DOT_SIZE / 2
+            }px`;
+
+            dotRef.current.style.backgroundColor = `rgb(255,${colorMap(
+              beta,
+              -180,
+              180
+            )},${colorMap(gamma, -90, 90)})`;
+
+            dotRef.current.style.borderRadius = `${rangeMap(
+              alpha,
+              0,
+              360,
+              0,
+              50
+            )}%`;
+
+            onChange?.({ alpha, beta, gamma });
+          }
+        });
+      })
+      .catch(() => {
+        setHasMotionDevice(false);
+        setError("This browser does not support device motion");
+      });
+  };
+
+  const motionAccess = () => {
     if (!window.DeviceMotionEvent?.requestPermission) {
-      setError("This browser does not support device motion");
+      initMotion();
     }
 
     window.DeviceMotionEvent?.requestPermission?.().then((response) => {
       if (response === "granted") {
-        setHasMotionDevice(true);
-
-        gn.init({ frequency: 50 })
-          .then(() => {
-            gn.start((data) => {
-              if (dotRef.current) {
-                const { alpha, beta, gamma } = data.do;
-
-                dotRef.current.style.left = `${
-                  rangeMap(gamma, -90, 90, 0, size.width) - DOT_SIZE / 2
-                }px`;
-
-                dotRef.current.style.top = `${
-                  rangeMap(beta, -90, 90, 0, size.height) - DOT_SIZE / 2
-                }px`;
-
-                dotRef.current.style.backgroundColor = `rgb(255,${colorMap(
-                  beta,
-                  -180,
-                  180
-                )},${colorMap(gamma, -90, 90)})`;
-
-                dotRef.current.style.borderRadius = `${rangeMap(
-                  alpha,
-                  0,
-                  360,
-                  0,
-                  50
-                )}%`;
-
-                onChange({ alpha, beta, gamma });
-              }
-            });
-          })
-          .catch(() => {
-            setHasMotionDevice(false);
-          });
+        initMotion();
       }
     });
   };
@@ -130,6 +135,8 @@ export const AccelPad: React.FC<{
             }}
           />
           <div
+            onTouchStart={() => onClick?.("on")}
+            onTouchEnd={() => onClick?.("off")}
             style={{
               position: "absolute",
               backgroundColor: "rgba(0,0,0,0)",
