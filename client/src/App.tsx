@@ -9,6 +9,7 @@ import { Dashboard } from "./Dashboard";
 import { AppDrawer } from "./AppDrawer";
 import { AppTopBar } from "./AppTopBar";
 import { FmSynth } from "./FmSynth";
+import { GmSynth } from "./GmTest";
 
 export type WsArgs = {
   address: string;
@@ -95,7 +96,7 @@ const App: React.FC = () => {
       <ConnectForm
         loading={loading}
         onSubmit={connectWebsocket}
-        open={!client}
+        open={!!client}
         error={error}
       />
       <Container maxWidth="md">
@@ -105,6 +106,7 @@ const App: React.FC = () => {
             <Bloom path="/bloom" onTransmit={playNote} />
             <Accelerometer path="/accel" onTransmit={playNote} />
             <FmSynth path="/fmsynth" />
+            <GmSynth path="/gmsynth" />
           </Router>
         </Box>
       </Container>

@@ -45,4 +45,12 @@ export const MODULES: ModuleType[] = [
     dashboard: true,
     description: "Attempt at a fm synthesizer",
   },
+  {
+    name: "GM Synth",
+    link: "/osc-controller/gmsynth",
+    icon: <Equalizer />,
+    image: ImgLandscape,
+    dashboard: true,
+    description: "GM implementation in FM",
+  },
 ];

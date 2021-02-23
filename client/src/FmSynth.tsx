@@ -54,13 +54,20 @@ export const FmSynth: React.FC<RouteComponentProps> = () => {
     mod1Gain.gain.value = gain1Val;
     const mod2Gain = ctx.createGain();
     mod2Gain.gain.value = gain2Val;
+    const mainGain = ctx.createGain();
+    mainGain.gain.value = 0.01;
+
+    // Modulation index
+    // Harmonicity ratio
+    // barry truaxs
 
     // Wiring everything up
     mod1.connect(mod1Gain);
     mod2.connect(mod2Gain);
     mod1Gain.connect(carrier.frequency);
     mod2Gain.connect(mod1.frequency);
-    carrier.connect(out);
+    carrier.connect(mainGain);
+    mainGain.connect(out);
 
     // Start making sound
     mod1.start();
