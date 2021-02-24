@@ -7,6 +7,8 @@ import "./libs/fulltilt";
 
 import App from "./App";
 
+window.AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+
 ReactDOM.render(
   <React.StrictMode>
     <CssBaseline />

@@ -9,7 +9,7 @@ import { Dashboard } from "./Dashboard";
 import { AppDrawer } from "./AppDrawer";
 import { AppTopBar } from "./AppTopBar";
 import { FmSynth } from "./FmSynth";
-import { GmSynth } from "./GmTest";
+import { GmTest } from "./GmTest";
 
 export type WsArgs = {
   address: string;
@@ -106,7 +106,7 @@ const App: React.FC = () => {
             <Bloom path="/bloom" onTransmit={playNote} />
             <Accelerometer path="/accel" onTransmit={playNote} />
             <FmSynth path="/fmsynth" />
-            <GmSynth path="/gmsynth" />
+            <GmTest path="/gmsynth" />
           </Router>
         </Box>
       </Container>

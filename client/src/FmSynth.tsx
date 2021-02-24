@@ -25,21 +25,32 @@ export const FmSynth: React.FC<RouteComponentProps> = () => {
   const [freq2Val, setFreq2Val] = React.useState(440);
   const [gain1Val, setGain1Val] = React.useState(3000);
   const [gain2Val, setGain2Val] = React.useState(3000);
+  const [context, setContext] = React.useState<AudioContext | null>(null);
+
+  React.useEffect(() => {
+    if (!context) {
+      setContext(new AudioContext());
+    }
+    return () => {
+      context?.close();
+    };
+  }, [context]);
 
   const startSynth = () => {
+    if (!context) {
+      return;
+    }
+
     // Create audio context
-    const AudioContext =
-      window.AudioContext || (window as any).webkitAudioContext;
-    const ctx = new AudioContext();
-    ctx.resume();
+    context.resume();
 
     // Setup
-    const out = ctx.destination;
+    const out = context.destination;
 
     // Instantiating
-    const mod1 = ctx.createOscillator(); // Modulator 1
-    const mod2 = ctx.createOscillator(); // Modulator 2
-    const carrier = ctx.createOscillator(); // Carrier
+    const mod1 = context.createOscillator(); // Modulator 1
+    const mod2 = context.createOscillator(); // Modulator 2
+    const carrier = context.createOscillator(); // Carrier
     carrier.type = "sine";
 
     // Setting frequencies
@@ -50,12 +61,12 @@ export const FmSynth: React.FC<RouteComponentProps> = () => {
     carrier.frequency.value = 440;
 
     // Modulation depth
-    const mod1Gain = ctx.createGain();
+    const mod1Gain = context.createGain();
     mod1Gain.gain.value = gain1Val;
-    const mod2Gain = ctx.createGain();
+    const mod2Gain = context.createGain();
     mod2Gain.gain.value = gain2Val;
-    const mainGain = ctx.createGain();
-    mainGain.gain.value = 0.01;
+    const mainGain = context.createGain();
+    mainGain.gain.value = 0.5;
 
     // Modulation index
     // Harmonicity ratio

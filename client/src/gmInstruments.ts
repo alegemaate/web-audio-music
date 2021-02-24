@@ -1,4 +1,4 @@
-import { GmPreset } from "./GmTest";
+import { GmPreset } from "./GmSynth";
 
 export const GM_INSTRUMENTS: GmPreset[] = [
   {
@@ -7,7 +7,8 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       dest: "out",
       type: "sine",
       ratio: 1.0,
-      feedback: 1000.0,
+      feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackLevel: 1.0,
         attackTime: 0.0,
@@ -24,12 +25,13 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 0.5,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackLevel: 0.0,
         attackTime: 0.0,
         decayLevel: 0.0,
         decayTime: 0.0,
-        sustainLevel: 1000.0,
+        sustainLevel: 0.0,
         sustainTime: 0.0,
         releaseLevel: 0.0,
         releaseTime: 0.0,
@@ -43,6 +45,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 1.0,
       feedback: 1.0,
+      level: 1.0,
       adsr: {
         attackLevel: 1.0,
         attackTime: 0.1,
@@ -59,6 +62,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sawtooth",
       ratio: 1.2,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackLevel: 0.0,
         attackTime: 0.1,
@@ -78,6 +82,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sawtooth",
       ratio: 1.0,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0.0,
         attackLevel: 1.0,
@@ -94,6 +99,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 1.2,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0.5,
         attackLevel: 1000.0,
@@ -115,6 +121,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 1.0,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0.5,
         attackLevel: 1.0,
@@ -131,6 +138,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sawtooth",
       ratio: 2.0,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0.7,
         attackLevel: 1000.0,
@@ -152,6 +160,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sawtooth",
       ratio: 1.0,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0,
         attackLevel: 1.0,
@@ -168,6 +177,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 0.501,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0.1,
         attackLevel: 1000.0,
@@ -189,6 +199,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 0.5,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0,
         attackLevel: 1.0,
@@ -205,6 +216,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 0.501,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0.1,
         attackLevel: 1000.0,
@@ -225,6 +237,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 1.0,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0,
         attackLevel: 1.0,
@@ -241,6 +254,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 1.27,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0.1,
         attackLevel: 1000.0,
@@ -261,6 +275,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 1.0,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0,
         attackLevel: 1.0,
@@ -277,6 +292,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 3.0,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0.01,
         attackLevel: 2000.0,
@@ -297,6 +313,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 1.0,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0,
         attackLevel: 1.0,
@@ -313,6 +330,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 3.0,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0.0,
         attackLevel: 2000.0,
@@ -333,6 +351,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 1.0,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0,
         attackLevel: 1.0,
@@ -349,12 +368,90 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       type: "sine",
       ratio: 2.01,
       feedback: 0.0,
+      level: 1.0,
       adsr: {
         attackTime: 0.0,
         attackLevel: 2000.0,
         decayTime: 0.2,
         decayLevel: 0.7,
         sustainTime: 5.0,
+        sustainLevel: 0.0,
+        releaseTime: 0.0,
+        releaseLevel: 0.0,
+      },
+    },
+  },
+  // Snare
+  {
+    gain: 1.0,
+    op1: {
+      dest: "out",
+      type: "sine",
+      ratio: 0.5,
+      feedback: 10090.0,
+      level: 1.0,
+      adsr: {
+        attackTime: 0.0,
+        attackLevel: 1.0,
+        decayTime: 0.1,
+        decayLevel: 0.0,
+        sustainTime: 0.0,
+        sustainLevel: 0.0,
+        releaseTime: 0.0,
+        releaseLevel: 0.0,
+      },
+    },
+    op2: {
+      dest: "out",
+      type: "sine",
+      ratio: 1.5,
+      feedback: 5000.0,
+      level: 1.0,
+      adsr: {
+        attackTime: 0.0,
+        attackLevel: 1.0,
+        decayTime: 0.1,
+        decayLevel: 0.0,
+        sustainTime: 0.0,
+        sustainLevel: 0.0,
+        releaseTime: 0.0,
+        releaseLevel: 0.0,
+      },
+    },
+  },
+
+  // Hat
+  {
+    gain: 1.0,
+    op1: {
+      dest: "out",
+      type: "sine",
+      ratio: 0.5,
+      feedback: 10090.0,
+      level: 1.0,
+      adsr: {
+        attackTime: 0.0,
+        attackLevel: 1.0,
+        decayTime: 0.04,
+        decayLevel: 0.0,
+        sustainTime: 0.0,
+        sustainLevel: 0.0,
+        releaseTime: 0.0,
+        releaseLevel: 0.0,
+      },
+    },
+    op2: {
+      dest: "out",
+      type: "sine",
+      ratio: 1.5,
+      feedback: 5000.0,
+      level: 1.0,
+      adsr: {
+        attackTime: 0.0,
+        attackLevel: 1.0,
+        decayTime: 0.02,
+        decayLevel: 0.0,
+        sustainTime: 0.0,
         sustainLevel: 0.0,
         releaseTime: 0.0,
         releaseLevel: 0.0,

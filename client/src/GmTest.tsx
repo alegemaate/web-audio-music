@@ -1,85 +1,76 @@
 import React from "react";
 import { RouteComponentProps } from "@reach/router";
-import { Button, Card, CardContent } from "@material-ui/core";
+import {
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  MenuItem,
+  Select,
+  Slider,
+  Typography,
+  InputLabel,
+  CardActions,
+} from "@material-ui/core";
+import { GmPreset, GmSynth } from "./GmSynth";
 import { GM_INSTRUMENTS } from "./gmInstruments";
+import { rangeMap } from "./helpers";
 
-export const GmSynth: React.FC<RouteComponentProps> = () => {
-  const [gmPlayer, setGmPlayer] = React.useState<GmPlayer | null>(null);
+export const GmTest: React.FC<RouteComponentProps> = () => {
+  const [gmSynth, setGmSynth] = React.useState<GmSynth | null>(null);
+  const [preset, setPreset] = React.useState<GmPreset>(GM_INSTRUMENTS[0]);
 
-  const startSynth = () => {
-    setGmPlayer(new GmPlayer());
-  };
+  React.useEffect(() => {
+    return () => {
+      gmSynth?.destroy();
+    };
+  }, [gmSynth]);
 
   const playNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    if (!gmPlayer) {
+    if (!gmSynth) {
+      setGmSynth(new GmSynth());
       return;
     }
-
-    // gmPlayer.programChange(1);
-    gmPlayer.changeInstrument({
-      gain: 1.0,
-      op1: {
-        dest: "out",
-        type: "sawtooth",
-        ratio: 1.0,
-        feedback: 0.0,
-        adsr: {
-          attackTime: 0.0,
-          attackLevel: 1.0,
-          decayTime: 0.0,
-          decayLevel: 1.0,
-          sustainTime: 1.0,
-          sustainLevel: 1.0,
-          releaseTime: 1.5,
-          releaseLevel: 0.0,
-        },
-      },
-      op2: {
-        dest: "op1",
-        type: "sine",
-        ratio: 1.2,
-        feedback: 0.0,
-        adsr: {
-          attackTime: 0.5,
-          attackLevel: 1000.0,
-          decayTime: 1.0,
-          decayLevel: 500.0,
-          sustainTime: 1.0,
-          sustainLevel: 100.0,
-          releaseTime: 1.0,
-          releaseLevel: 0.0,
-        },
-      },
-    });
-
-    const freq = event.clientX + 50;
-    gmPlayer.play(freq);
+    gmSynth.changeInstrument(preset);
+    const bounding = event.currentTarget.getBoundingClientRect();
+    const freq = rangeMap(
+      event.clientX - bounding.x,
+      0,
+      bounding.width,
+      50,
+      2000
+    );
+    gmSynth.play(freq);
   };
 
   const stopNote = () => {
-    if (!gmPlayer) {
+    if (!gmSynth) {
       return;
     }
 
-    gmPlayer.stop();
+    gmSynth.stop();
+  };
+
+  const reset = () => {
+    setPreset(GM_INSTRUMENTS[0]);
   };
 
   return (
     <>
-      <Card>
-        <CardContent>
-          {!gmPlayer && (
-            <Button
-              onClick={startSynth}
-              variant="outlined"
-              color="primary"
-              fullWidth
-            >
-              Start
-            </Button>
-          )}
-          {gmPlayer && (
-            <>
+      <Grid container spacing={1}>
+        <Grid xs={6} item>
+          <OpPreset op="op1" preset={preset} setPreset={setPreset} />
+        </Grid>
+        <Grid xs={6} item>
+          <OpPreset op="op2" preset={preset} setPreset={setPreset} />
+        </Grid>
+
+        <Grid xs={12} item>
+          <Card>
+            <CardContent>
+              <Typography variant="h5">Controller</Typography>
+            </CardContent>
+            <CardActions>
               <Button
                 onMouseDown={playNote}
                 onMouseUp={stopNote}
@@ -87,255 +78,346 @@ export const GmSynth: React.FC<RouteComponentProps> = () => {
                 color="primary"
                 fullWidth
               >
-                Note
+                Play
               </Button>
-            </>
-          )}
-        </CardContent>
-      </Card>
+
+              <Button
+                onClick={playNote}
+                variant="outlined"
+                color="primary"
+                fullWidth
+              >
+                Hold
+              </Button>
+
+              <Button
+                onClick={stopNote}
+                variant="outlined"
+                color="primary"
+                fullWidth
+              >
+                Stop
+              </Button>
+
+              <Button
+                onClick={reset}
+                variant="outlined"
+                color="primary"
+                fullWidth
+              >
+                Reset
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
+      </Grid>
     </>
   );
 };
 
-interface GmAdsrPreset {
-  attackLevel: number;
-  attackTime: number;
-  decayLevel: number;
-  decayTime: number;
-  sustainLevel: number;
-  sustainTime: number;
-  releaseLevel: number;
-  releaseTime: number;
-}
+const OpPreset: React.FC<{
+  op: "op1" | "op2";
+  preset: GmPreset;
+  setPreset: React.Dispatch<React.SetStateAction<GmPreset>>;
+}> = ({ preset, setPreset, op }) => {
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant="h5" gutterBottom>
+          {op === "op1" ? "Operator 1" : "Operator 2"}
+        </Typography>
 
-interface GmOpPreset {
-  type: "sawtooth" | "sine" | "square" | "triangle";
-  dest: "op1" | "op2" | "out" | "blackhole";
-  ratio: number;
-  adsr: GmAdsrPreset;
-  feedback: number;
-}
+        <InputLabel>Wave Type</InputLabel>
+        <Select
+          style={{ marginBottom: 16 }}
+          value={preset[op].type}
+          onChange={(
+            event: React.ChangeEvent<{
+              value: unknown;
+            }>
+          ) => {
+            const type = event.target.value as
+              | "sawtooth"
+              | "sine"
+              | "square"
+              | "triangle";
+            setPreset({ ...preset, [op]: { ...preset[op], type } });
+          }}
+          fullWidth
+        >
+          <MenuItem value="sine">Sine</MenuItem>
+          <MenuItem value="sawtooth">Sawtooth</MenuItem>
+          <MenuItem value="triangle">Triangle</MenuItem>
+          <MenuItem value="square">Square</MenuItem>
+        </Select>
 
-export interface GmPreset {
-  gain: number;
-  op1: GmOpPreset;
-  op2: GmOpPreset;
-}
+        <InputLabel>Destination</InputLabel>
+        <Select
+          style={{ marginBottom: 16 }}
+          value={preset[op].dest}
+          onChange={(
+            event: React.ChangeEvent<{
+              value: unknown;
+            }>
+          ) => {
+            const dest = event.target.value as
+              | "op1"
+              | "op2"
+              | "out"
+              | "blackhole";
+            setPreset({ ...preset, [op]: { ...preset[op], dest } });
+          }}
+          fullWidth
+        >
+          {op === "op2" && <MenuItem value="op1">Operator 1</MenuItem>}
+          {op === "op1" && <MenuItem value="op2">Operator 2</MenuItem>}
+          <MenuItem value="out">Output</MenuItem>
+          <MenuItem value="blackhole">Blackhole</MenuItem>
+        </Select>
 
-export class GmPlayer {
-  private static context: AudioContext;
+        <InputLabel>Level</InputLabel>
+        <Slider
+          valueLabelDisplay="auto"
+          value={preset[op].level}
+          onChange={(_event: unknown, value: number | number[]) => {
+            if (typeof value === "number") {
+              setPreset({ ...preset, [op]: { ...preset[op], level: value } });
+            }
+          }}
+          max={10000}
+          min={0}
+          step={1}
+        />
 
-  private readonly gain: GainNode;
+        <InputLabel>Level (Fine)</InputLabel>
+        <Slider
+          valueLabelDisplay="auto"
+          value={preset[op].level}
+          onChange={(_event: unknown, value: number | number[]) => {
+            if (typeof value === "number") {
+              setPreset({ ...preset, [op]: { ...preset[op], level: value } });
+            }
+          }}
+          max={1}
+          min={0}
+          step={0.01}
+        />
 
-  private readonly op1: OscillatorNode;
+        <InputLabel>Ratio</InputLabel>
+        <Slider
+          valueLabelDisplay="auto"
+          value={preset[op].ratio}
+          onChange={(_event: unknown, value: number | number[]) => {
+            if (typeof value === "number") {
+              setPreset({ ...preset, [op]: { ...preset[op], ratio: value } });
+            }
+          }}
+          max={10}
+          min={0}
+          step={0.01}
+        />
 
-  private readonly op2: OscillatorNode;
+        <InputLabel>Feedback</InputLabel>
+        <Slider
+          valueLabelDisplay="auto"
+          value={preset[op].feedback}
+          onChange={(_event: unknown, value: number | number[]) => {
+            if (typeof value === "number") {
+              setPreset({
+                ...preset,
+                [op]: { ...preset[op], feedback: value },
+              });
+            }
+          }}
+          max={2000}
+          min={0}
+          step={1}
+        />
 
-  private readonly op1Gain: GainNode;
+        <Typography variant="h5" gutterBottom>
+          ADSR
+        </Typography>
 
-  private readonly op2Gain: GainNode;
+        <Grid container spacing={1}>
+          <Grid xs={6} item>
+            <InputLabel>Attack Time</InputLabel>
+            <Slider
+              valueLabelDisplay="auto"
+              value={preset[op].adsr.attackTime}
+              onChange={(_event: unknown, value: number | number[]) => {
+                if (typeof value === "number") {
+                  setPreset({
+                    ...preset,
+                    [op]: {
+                      ...preset[op],
+                      adsr: { ...preset[op].adsr, attackTime: value },
+                    },
+                  });
+                }
+              }}
+              max={5}
+              min={0}
+              step={0.1}
+            />
+          </Grid>
+          <Grid xs={6} item>
+            <InputLabel>Attack Level</InputLabel>
+            <Slider
+              valueLabelDisplay="auto"
+              value={preset[op].adsr.attackLevel}
+              onChange={(_event: unknown, value: number | number[]) => {
+                if (typeof value === "number") {
+                  setPreset({
+                    ...preset,
+                    [op]: {
+                      ...preset[op],
+                      adsr: { ...preset[op].adsr, attackLevel: value },
+                    },
+                  });
+                }
+              }}
+              max={1.0}
+              min={0}
+              step={0.01}
+            />
+          </Grid>
+        </Grid>
 
-  private readonly op1Feedback: GainNode;
+        <Grid container spacing={1}>
+          <Grid xs={6} item>
+            <InputLabel>Decay Time</InputLabel>
+            <Slider
+              valueLabelDisplay="auto"
+              value={preset[op].adsr.decayTime}
+              onChange={(_event: unknown, value: number | number[]) => {
+                if (typeof value === "number") {
+                  setPreset({
+                    ...preset,
+                    [op]: {
+                      ...preset[op],
+                      adsr: { ...preset[op].adsr, decayTime: value },
+                    },
+                  });
+                }
+              }}
+              max={5}
+              min={0}
+              step={0.1}
+            />
+          </Grid>
+          <Grid xs={6} item>
+            <InputLabel>Decay Level</InputLabel>
+            <Slider
+              valueLabelDisplay="auto"
+              value={preset[op].adsr.decayLevel}
+              onChange={(_event: unknown, value: number | number[]) => {
+                if (typeof value === "number") {
+                  setPreset({
+                    ...preset,
+                    [op]: {
+                      ...preset[op],
+                      adsr: { ...preset[op].adsr, decayLevel: value },
+                    },
+                  });
+                }
+              }}
+              max={1.0}
+              min={0}
+              step={0.01}
+            />
+          </Grid>
+        </Grid>
 
-  private readonly op2Feedback: GainNode;
+        <Grid container spacing={1}>
+          <Grid xs={6} item>
+            <InputLabel>Sustain Time</InputLabel>
+            <Slider
+              valueLabelDisplay="auto"
+              value={preset[op].adsr.sustainTime}
+              onChange={(_event: unknown, value: number | number[]) => {
+                if (typeof value === "number") {
+                  setPreset({
+                    ...preset,
+                    [op]: {
+                      ...preset[op],
+                      adsr: { ...preset[op].adsr, sustainTime: value },
+                    },
+                  });
+                }
+              }}
+              max={5}
+              min={0}
+              step={0.1}
+            />
+          </Grid>
+          <Grid xs={6} item>
+            <InputLabel>Sustain Level</InputLabel>
+            <Slider
+              valueLabelDisplay="auto"
+              value={preset[op].adsr.sustainLevel}
+              onChange={(_event: unknown, value: number | number[]) => {
+                if (typeof value === "number") {
+                  setPreset({
+                    ...preset,
+                    [op]: {
+                      ...preset[op],
+                      adsr: { ...preset[op].adsr, sustainLevel: value },
+                    },
+                  });
+                }
+              }}
+              max={1.0}
+              min={0}
+              step={0.01}
+            />
+          </Grid>
+        </Grid>
 
-  private op1Ratio: number;
-
-  private op2Ratio: number;
-
-  private op1Adsr: GmAdsrPreset;
-
-  private op2Adsr: GmAdsrPreset;
-
-  public constructor() {
-    // Create audio context
-    const AudioContext =
-      window.AudioContext || (window as any).webkitAudioContext;
-    GmPlayer.context = new AudioContext();
-    GmPlayer.context.resume();
-
-    // Create oscs
-    this.op1 = GmPlayer.context.createOscillator();
-    this.op2 = GmPlayer.context.createOscillator();
-
-    // Create gains
-    this.op1Gain = GmPlayer.context.createGain();
-    this.op2Gain = GmPlayer.context.createGain();
-
-    // Create feedbacks
-    this.op1Feedback = GmPlayer.context.createGain();
-    this.op2Feedback = GmPlayer.context.createGain();
-
-    // Create global gain
-    this.gain = GmPlayer.context.createGain();
-    this.gain.connect(GmPlayer.context.destination);
-
-    // Wiring
-    this.op1
-      .connect(this.op1Gain)
-      .connect(this.op1Feedback)
-      .connect(this.op1.frequency);
-    this.op2
-      .connect(this.op2Gain)
-      .connect(this.op2Feedback)
-      .connect(this.op2.frequency);
-
-    // Start synth
-    this.op1.start();
-    this.op2.start();
-
-    // Setup adsr
-    this.op1Adsr = {
-      attackLevel: 1,
-      attackTime: 1,
-      decayLevel: 1,
-      decayTime: 1,
-      sustainLevel: 1,
-      sustainTime: 1,
-      releaseLevel: 0,
-      releaseTime: 1,
-    };
-
-    this.op2Adsr = {
-      attackLevel: 1,
-      attackTime: 1,
-      decayLevel: 1,
-      decayTime: 1,
-      sustainLevel: 1,
-      sustainTime: 1,
-      releaseLevel: 0,
-      releaseTime: 1,
-    };
-
-    // Set ratios
-    this.op1Ratio = 1.0;
-    this.op2Ratio = 1.0;
-  }
-
-  public programChange(instrument: number): void {
-    const preset = GM_INSTRUMENTS[instrument];
-
-    if (!preset) {
-      return;
-    }
-
-    this.changeInstrument(preset);
-  }
-
-  public changeInstrument(preset: GmPreset): void {
-    // Gain
-    this.gain.gain.value = preset.gain;
-
-    // Wave
-    this.op1.type = preset.op1.type;
-    this.op2.type = preset.op2.type;
-
-    // Ratio
-    this.op1Ratio = preset.op1.ratio;
-    this.op2Ratio = preset.op2.ratio;
-
-    // Gain
-    this.op1Gain.gain.value = 0.0;
-    this.op2Gain.gain.value = 0.0;
-
-    // Feedback
-    this.op1Feedback.gain.value = preset.op1.feedback;
-    this.op2Feedback.gain.value = preset.op2.feedback;
-
-    // ADSR
-    this.op1Adsr = preset.op1.adsr;
-    this.op2Adsr = preset.op2.adsr;
-
-    // Op 1 wiring
-    this.op1Gain.disconnect();
-    switch (preset.op1.dest) {
-      case "op2":
-        this.op1Gain.connect(this.op2.frequency);
-        break;
-      case "out":
-        this.op1Gain.connect(this.gain);
-        break;
-      default:
-        break;
-    }
-
-    // Op 2 wiring
-    this.op2Gain.disconnect();
-    switch (preset.op2.dest) {
-      case "op1":
-        this.op2Gain.connect(this.op1.frequency);
-        break;
-      case "out":
-        this.op2Gain.connect(this.gain);
-        break;
-      default:
-        break;
-    }
-  }
-
-  public play(freq: number): void {
-    // Set frequency
-    this.op1.frequency.value = freq * this.op1Ratio;
-    this.op2.frequency.value = freq * this.op2Ratio;
-
-    const now = GmPlayer.context.currentTime;
-
-    // Op 1 ADSR
-    this.op1Gain.gain.cancelScheduledValues(0);
-    this.op1Gain.gain.setValueAtTime(0, now);
-    this.op1Gain.gain.linearRampToValueAtTime(
-      this.op1Adsr.attackLevel,
-      now + this.op1Adsr.attackTime
-    );
-    this.op1Gain.gain.linearRampToValueAtTime(
-      this.op1Adsr.decayLevel,
-      now + this.op1Adsr.attackTime + this.op1Adsr.decayTime
-    );
-    this.op1Gain.gain.linearRampToValueAtTime(
-      this.op1Adsr.sustainLevel,
-      now +
-        this.op1Adsr.attackTime +
-        this.op1Adsr.decayTime +
-        this.op1Adsr.sustainTime
-    );
-
-    // Op 2 ADSR
-    this.op2Gain.gain.cancelScheduledValues(0);
-    this.op2Gain.gain.setValueAtTime(0, now);
-    this.op2Gain.gain.linearRampToValueAtTime(
-      this.op2Adsr.attackLevel,
-      now + this.op2Adsr.attackTime
-    );
-    this.op2Gain.gain.linearRampToValueAtTime(
-      this.op2Adsr.decayLevel,
-      now + this.op2Adsr.attackTime + this.op2Adsr.decayTime
-    );
-    this.op2Gain.gain.linearRampToValueAtTime(
-      this.op2Adsr.sustainLevel,
-      now +
-        this.op2Adsr.attackTime +
-        this.op2Adsr.decayTime +
-        this.op2Adsr.sustainTime
-    );
-  }
-
-  public stop(): void {
-    const now = GmPlayer.context.currentTime;
-
-    // Op 1 ADSR
-    this.op1Gain.gain.cancelScheduledValues(0);
-    this.op1Gain.gain.setValueAtTime(this.op1Gain.gain.value, now);
-    this.op1Gain.gain.linearRampToValueAtTime(
-      this.op1Adsr.releaseLevel,
-      now + this.op1Adsr.releaseTime
-    );
-
-    // Op 2 ADSR
-    this.op2Gain.gain.cancelScheduledValues(0);
-    this.op2Gain.gain.setValueAtTime(this.op2Gain.gain.value, now);
-    this.op2Gain.gain.linearRampToValueAtTime(
-      this.op2Adsr.releaseLevel,
-      now + this.op2Adsr.releaseTime
-    );
-  }
-}
+        <Grid container spacing={1}>
+          <Grid xs={6} item>
+            <InputLabel>Release Time</InputLabel>
+            <Slider
+              valueLabelDisplay="auto"
+              value={preset[op].adsr.releaseTime}
+              onChange={(_event: unknown, value: number | number[]) => {
+                if (typeof value === "number") {
+                  setPreset({
+                    ...preset,
+                    [op]: {
+                      ...preset[op],
+                      adsr: { ...preset[op].adsr, releaseTime: value },
+                    },
+                  });
+                }
+              }}
+              max={5}
+              min={0}
+              step={0.1}
+            />
+          </Grid>
+          <Grid xs={6} item>
+            <InputLabel>Release Level</InputLabel>
+            <Slider
+              valueLabelDisplay="auto"
+              value={preset[op].adsr.releaseLevel}
+              onChange={(_event: unknown, value: number | number[]) => {
+                if (typeof value === "number") {
+                  setPreset({
+                    ...preset,
+                    [op]: {
+                      ...preset[op],
+                      adsr: { ...preset[op].adsr, releaseLevel: value },
+                    },
+                  });
+                }
+              }}
+              max={1.0}
+              min={0}
+              step={0.01}
+            />
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+};

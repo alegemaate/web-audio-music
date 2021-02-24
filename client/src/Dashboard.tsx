@@ -27,7 +27,7 @@ export const Dashboard: React.FC<RouteComponentProps> = () => {
   return (
     <Grid container spacing={1}>
       {MODULES.map((mod) => (
-        <Grid xs={6} item>
+        <Grid xs={6} item key={mod.name}>
           <Link to={mod.link} style={{ textDecoration: "none" }}>
             <Card className={classes.root}>
               <CardActionArea>
