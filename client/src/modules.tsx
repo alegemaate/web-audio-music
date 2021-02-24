@@ -3,6 +3,8 @@ import { Equalizer, Home } from "@material-ui/icons";
 
 import ImgLandscape from "./images/landscape.jpg";
 import ImgBloom from "./images/bloom.png";
+import ImgGmSynth from "./images/gmsynth.png";
+import ImgFmSynth from "./images/fmsynth.png";
 
 type ModuleType = {
   name: string;
@@ -41,7 +43,7 @@ export const MODULES: ModuleType[] = [
     name: "FM Synth",
     link: "/osc-controller/fmsynth",
     icon: <Equalizer />,
-    image: ImgLandscape,
+    image: ImgFmSynth,
     dashboard: true,
     description: "Attempt at a fm synthesizer",
   },
@@ -49,7 +51,7 @@ export const MODULES: ModuleType[] = [
     name: "GM Synth",
     link: "/osc-controller/gmsynth",
     icon: <Equalizer />,
-    image: ImgLandscape,
+    image: ImgGmSynth,
     dashboard: true,
     description: "GM implementation in FM",
   },

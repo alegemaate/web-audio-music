@@ -47,8 +47,6 @@ export class GmSynth {
 
   public constructor() {
     // Create audio context
-    const AudioContext =
-      window.AudioContext || (window as any).webkitAudioContext;
     this.context = new AudioContext();
     this.context.resume();
 
@@ -74,7 +72,7 @@ export class GmSynth {
     this.op2.connect(this.op2Feedback).connect(this.op2.frequency);
     this.gain.connect(this.context.destination);
 
-    // Start synth
+    // Start Synth
     this.op1.start();
     this.op2.start();
 
@@ -206,8 +204,6 @@ export class GmSynth {
   }
 
   public destroy() {
-    this.op1.stop();
-    this.op2.stop();
     this.op1.disconnect();
     this.op2.disconnect();
     this.op1Gain.disconnect();
@@ -215,6 +211,10 @@ export class GmSynth {
     this.op1Feedback.disconnect();
     this.op2Feedback.disconnect();
     this.gain.disconnect();
-    this.context.close();
+    if (this.context.state !== "closed") {
+      this.context.close();
+      this.op1.stop();
+      this.op2.stop();
+    }
   }
 }

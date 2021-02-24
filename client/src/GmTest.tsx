@@ -20,12 +20,6 @@ export const GmTest: React.FC<RouteComponentProps> = () => {
   const [gmSynth, setGmSynth] = React.useState<GmSynth | null>(null);
   const [preset, setPreset] = React.useState<GmPreset>(GM_INSTRUMENTS[0]);
 
-  React.useEffect(() => {
-    return () => {
-      gmSynth?.destroy();
-    };
-  }, [gmSynth]);
-
   const playNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     if (!gmSynth) {
       setGmSynth(new GmSynth());
