@@ -203,7 +203,7 @@ export class GmSynth {
     );
   }
 
-  public destroy() {
+  public destroy(): void {
     this.op1.disconnect();
     this.op2.disconnect();
     this.op1Gain.disconnect();
@@ -216,5 +216,13 @@ export class GmSynth {
       this.op1.stop();
       this.op2.stop();
     }
+  }
+
+  public bundlePreset(): string {
+    return btoa(JSON.stringify(this.preset));
+  }
+
+  public unbundlePreset(code: string): GmPreset {
+    return JSON.parse(atob(code)) as GmPreset;
   }
 }

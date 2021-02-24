@@ -1,4 +1,5 @@
 import React from "react";
+import * as yup from "yup";
 import { RouteComponentProps } from "@reach/router";
 import {
   Button,
@@ -11,6 +12,7 @@ import {
   Typography,
   InputLabel,
   CardActions,
+  TextField,
 } from "@material-ui/core";
 import { GmPreset, GmSynth } from "./GmSynth";
 import { GM_INSTRUMENTS } from "./gmInstruments";
@@ -19,6 +21,9 @@ import { rangeMap } from "./helpers";
 export const GmTest: React.FC<RouteComponentProps> = () => {
   const [gmSynth, setGmSynth] = React.useState<GmSynth | null>(null);
   const [preset, setPreset] = React.useState<GmPreset>(GM_INSTRUMENTS[0]);
+  const [copied, setCopied] = React.useState(false);
+  const [presetText, setPresetText] = React.useState("");
+  const [presetError, setPresetError] = React.useState("");
 
   const playNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     if (!gmSynth) {
@@ -47,6 +52,70 @@ export const GmTest: React.FC<RouteComponentProps> = () => {
 
   const reset = () => {
     setPreset(GM_INSTRUMENTS[0]);
+  };
+
+  const copyPreset = async () => {
+    await navigator.clipboard.writeText(btoa(JSON.stringify(preset)));
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 1000);
+  };
+
+  const handlePresetChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
+    setPresetText(event.target.value);
+  };
+
+  const loadPreset = () => {
+    try {
+      const parsed = JSON.parse(atob(presetText));
+
+      const opSchema = yup
+        .object({
+          type: yup
+            .mixed<"sawtooth" | "sine" | "square" | "triangle">()
+            .oneOf(["sawtooth", "sine", "square", "triangle"])
+            .required(),
+          dest: yup
+            .mixed<"op1" | "op2" | "out" | "blackhole">()
+            .oneOf(["op1", "op2", "out", "blackhole"])
+            .required(),
+          ratio: yup.number().required(),
+          feedback: yup.number().required(),
+          level: yup.number().required(),
+          adsr: yup
+            .object({
+              attackLevel: yup.number().required(),
+              attackTime: yup.number().required(),
+              decayLevel: yup.number().required(),
+              decayTime: yup.number().required(),
+              sustainLevel: yup.number().required(),
+              sustainTime: yup.number().required(),
+              releaseLevel: yup.number().required(),
+              releaseTime: yup.number().required(),
+            })
+            .required(),
+        })
+        .required();
+
+      const schema = yup
+        .object({
+          gain: yup.number().required(),
+          op1: opSchema,
+          op2: opSchema,
+        })
+        .required();
+
+      const res = schema.validateSync(parsed);
+      setPreset(res);
+    } catch (e) {
+      setPresetError("Invalid preset");
+    }
+    setTimeout(() => {
+      setPresetError("");
+    }, 1000);
   };
 
   return (
@@ -100,6 +169,41 @@ export const GmTest: React.FC<RouteComponentProps> = () => {
                 fullWidth
               >
                 Reset
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
+
+        <Grid xs={12} item>
+          <Card>
+            <CardContent>
+              <Typography variant="h5">Presets</Typography>
+            </CardContent>
+            <CardActions>
+              <Button
+                onClick={copyPreset}
+                variant="outlined"
+                color={copied ? "secondary" : "primary"}
+                fullWidth
+              >
+                {copied ? "Copied!" : "Copy preset"}
+              </Button>
+            </CardActions>
+            <CardActions>
+              <TextField
+                variant="outlined"
+                color="primary"
+                fullWidth
+                type="text"
+                onChange={handlePresetChange}
+              />
+              <Button
+                onClick={loadPreset}
+                variant="outlined"
+                fullWidth
+                color={presetError ? "secondary" : "primary"}
+              >
+                {presetError ? presetError : "Load Preset"}
               </Button>
             </CardActions>
           </Card>
