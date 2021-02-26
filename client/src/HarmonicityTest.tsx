@@ -79,10 +79,6 @@ export const HarmonicityTest: React.FC<RouteComponentProps> = () => {
     gmSynth.stop();
   };
 
-  const reset = () => {
-    setPreset(GM_INSTRUMENTS[0]);
-  };
-
   return (
     <>
       <Grid container spacing={1}>
@@ -118,15 +114,6 @@ export const HarmonicityTest: React.FC<RouteComponentProps> = () => {
                 fullWidth
               >
                 Stop
-              </Button>
-
-              <Button
-                onClick={reset}
-                variant="outlined"
-                color="primary"
-                fullWidth
-              >
-                Reset
               </Button>
             </CardActions>
           </Card>
