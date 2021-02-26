@@ -24,6 +24,7 @@ export interface GmPreset {
   gain: number;
   op1: GmOpPreset;
   op2: GmOpPreset;
+  name?: string;
 }
 
 export class GmSynth {
