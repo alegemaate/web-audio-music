@@ -24,8 +24,9 @@ const useStyles = makeStyles((theme) => ({
 export const AppTopBar: React.FC<{
   toggleDrawer: () => void;
   onDisconnect: () => void;
+  onConnect: () => void;
   url?: string;
-}> = ({ toggleDrawer, url, onDisconnect }) => {
+}> = ({ toggleDrawer, url, onDisconnect, onConnect }) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null
   );
@@ -46,6 +47,11 @@ export const AppTopBar: React.FC<{
 
   const handleDisconnect = () => {
     onDisconnect();
+    handleClose();
+  };
+
+  const handleConnect = () => {
+    onConnect();
     handleClose();
   };
 
@@ -92,9 +98,27 @@ export const AppTopBar: React.FC<{
           </>
         )}
         {!url && (
-          <IconButton color="inherit">
-            <SyncDisabledRounded />
-          </IconButton>
+          <>
+            <IconButton color="inherit" onClick={handleOpen}>
+              <SyncDisabledRounded />
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={open}
+              onClose={handleClose}
+            >
+              <MenuItem onClick={handleConnect}>Connect</MenuItem>
+            </Menu>
+          </>
         )}
       </Toolbar>
     </AppBar>

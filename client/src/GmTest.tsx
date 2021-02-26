@@ -188,7 +188,7 @@ export const GmTest: React.FC<RouteComponentProps> = () => {
                     setPreset(GM_INSTRUMENTS[event.target.value]);
                   }
                 }}
-                defaultValue={-1}
+                defaultValue={0}
                 fullWidth
                 placeholder="Select a preset"
                 color="primary"

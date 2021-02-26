@@ -14,7 +14,8 @@ export const ConnectForm: React.FC<{
   loading: boolean;
   open: boolean;
   error: string;
-}> = ({ onSubmit, loading, open, error }) => {
+  onClose: () => void;
+}> = ({ onSubmit, loading, open, error, onClose }) => {
   const [url, setUrl] = React.useState("");
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,7 +37,7 @@ export const ConnectForm: React.FC<{
   }, []);
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>Connect to OSC Controller</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -61,6 +62,9 @@ export const ConnectForm: React.FC<{
       <DialogActions>
         <Button color="primary" disabled={loading} onClick={handleSubmit}>
           Connect
+        </Button>
+        <Button color="primary" disabled={loading} onClick={onClose}>
+          Close
         </Button>
       </DialogActions>
     </Dialog>
