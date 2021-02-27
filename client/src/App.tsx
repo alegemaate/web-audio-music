@@ -11,6 +11,7 @@ import { AppTopBar } from "./AppTopBar";
 import { FmSynth } from "./FmSynth";
 import { GmTest } from "./GmTest";
 import { HarmonicityTest } from "./HarmonicityTest";
+import { WaveformDraw } from "./WaveformDraw";
 
 export type WsArgs = {
   address: string;
@@ -113,6 +114,7 @@ const App: React.FC = () => {
             <FmSynth path="/fmsynth" />
             <GmTest path="/gmsynth" />
             <HarmonicityTest path="/harmonicity" />
+            <WaveformDraw path="/waveform" />
           </Router>
         </Box>
       </Container>

@@ -11,7 +11,6 @@ import {
   CardActions,
 } from "@material-ui/core";
 import { GmPreset, GmSynth } from "./GmSynth";
-import { GM_INSTRUMENTS } from "./gmInstruments";
 import { rangeMap } from "./helpers";
 
 export const HarmonicityTest: React.FC<RouteComponentProps> = () => {

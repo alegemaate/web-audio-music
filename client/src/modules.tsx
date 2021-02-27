@@ -63,4 +63,12 @@ export const MODULES: ModuleType[] = [
     dashboard: true,
     description: "Harmonicity Ratio Playground",
   },
+  {
+    name: "Waveform Draw",
+    link: "/osc-controller/waveform",
+    icon: <Equalizer />,
+    image: ImgLandscape,
+    dashboard: true,
+    description: "Draw waveform using canvas",
+  },
 ];

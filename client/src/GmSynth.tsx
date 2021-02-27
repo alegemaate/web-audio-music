@@ -12,7 +12,11 @@ interface GmAdsrPreset {
 }
 
 interface GmOpPreset {
-  type: "sawtooth" | "sine" | "square" | "triangle";
+  type: "sawtooth" | "sine" | "square" | "triangle" | "custom";
+  custom?: {
+    real: Float32Array;
+    imag: Float32Array;
+  };
   dest: "op1" | "op2" | "out" | "blackhole";
   ratio: number;
   adsr: GmAdsrPreset;
@@ -44,12 +48,18 @@ export class GmSynth {
 
   private readonly op2Feedback: GainNode;
 
+  private readonly analyser: AnalyserNode;
+
   private preset: GmPreset;
 
   public constructor() {
     // Create audio context
     this.context = new AudioContext();
     this.context.resume();
+
+    // Create analyser
+    this.analyser = this.context.createAnalyser();
+    this.analyser.fftSize = 256;
 
     // Create oscs
     this.op1 = this.context.createOscillator();
@@ -72,6 +82,7 @@ export class GmSynth {
     this.op2.connect(this.op2Gain);
     this.op2.connect(this.op2Feedback).connect(this.op2.frequency);
     this.gain.connect(this.context.destination);
+    this.gain.connect(this.analyser);
 
     // Start Synth
     this.op1.start();
@@ -100,8 +111,26 @@ export class GmSynth {
     this.gain.gain.value = preset.gain;
 
     // Wave
-    this.op1.type = preset.op1.type;
-    this.op2.type = preset.op2.type;
+
+    if (preset.op1.type === "custom" && preset.op1.custom) {
+      const wave = this.context.createPeriodicWave(
+        preset.op1.custom.real,
+        preset.op1.custom.imag
+      );
+      this.op1.setPeriodicWave(wave);
+    } else {
+      this.op1.type = preset.op1.type;
+    }
+
+    if (preset.op2.type === "custom" && preset.op2.custom) {
+      const wave = this.context.createPeriodicWave(
+        preset.op2.custom.real,
+        preset.op2.custom.imag
+      );
+      this.op2.setPeriodicWave(wave);
+    } else {
+      this.op2.type = preset.op2.type;
+    }
 
     // Gain
     this.op1Gain.gain.value = 0.0;
@@ -219,11 +248,7 @@ export class GmSynth {
     }
   }
 
-  public bundlePreset(): string {
-    return btoa(JSON.stringify(this.preset));
-  }
-
-  public unbundlePreset(code: string): GmPreset {
-    return JSON.parse(atob(code)) as GmPreset;
+  public getAnalyser(): AnalyserNode {
+    return this.analyser;
   }
 }
