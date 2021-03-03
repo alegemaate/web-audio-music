@@ -9,14 +9,15 @@ import {
   Slider,
   Typography,
 } from "@material-ui/core";
-import { GmPreset, GmSynth } from "./GmSynth";
-import { Oscilloscope } from "./Oscilloscope";
-import { DotDraw } from "./DotDraw";
+
+import { FmPreset, FmSynth } from "../components/FmSynth";
+import { Oscilloscope } from "../components/Oscilloscope";
+import { DotDraw } from "../components/DotDraw";
 
 const CANVAS_HEIGHT = 300;
 const DEFAULT_SAMPLES = 20;
 
-const DEFAULT_PRESET: GmPreset = {
+const DEFAULT_PRESET: FmPreset = {
   name: "Basic",
   gain: 1.0,
   op1: {
@@ -106,12 +107,12 @@ export const WaveformDraw: React.FC<RouteComponentProps> = () => {
     real: new Float32Array(DEFAULT_SAMPLES),
     imag: new Float32Array(DEFAULT_SAMPLES),
   });
-  const [gmSynth, setGmSynth] = React.useState<GmSynth | null>(null);
+  const [fmSynth, setFmSynth] = React.useState<FmSynth | null>(null);
   const [freq, setFreq] = React.useState(440);
 
   React.useEffect(() => {
     // Update preset with points
-    const newPreset: GmPreset = {
+    const newPreset: FmPreset = {
       ...DEFAULT_PRESET,
       op1: {
         ...DEFAULT_PRESET.op1,
@@ -120,17 +121,17 @@ export const WaveformDraw: React.FC<RouteComponentProps> = () => {
       },
     };
 
-    if (gmSynth) {
-      gmSynth.changeInstrument(newPreset);
-      gmSynth.play(freq);
+    if (fmSynth) {
+      fmSynth.changeInstrument(newPreset);
+      fmSynth.play(freq);
     }
-  }, [points, freq, gmSynth]);
+  }, [points, freq, fmSynth]);
 
   const stopNote = () => {
-    if (!gmSynth) {
+    if (!fmSynth) {
       return;
     }
-    gmSynth.stop();
+    fmSynth.stop();
   };
 
   const reset = () => {
@@ -141,8 +142,8 @@ export const WaveformDraw: React.FC<RouteComponentProps> = () => {
   };
 
   const startSynth = () => {
-    if (!gmSynth) {
-      setGmSynth(new GmSynth());
+    if (!fmSynth) {
+      setFmSynth(new FmSynth());
     }
   };
 
@@ -166,7 +167,7 @@ export const WaveformDraw: React.FC<RouteComponentProps> = () => {
           setPoints({ ...points, imag });
         }}
       />
-      <Oscilloscope analyser={gmSynth?.getAnalyser()} />
+      <Oscilloscope analyser={fmSynth?.getAnalyser()} />
       <CardActions>
         <Button
           onClick={startSynth}

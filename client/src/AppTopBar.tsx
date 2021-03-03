@@ -72,7 +72,7 @@ export const AppTopBar: React.FC<{
           className={classes.title}
           style={{ textDecoration: "none", color: "white" }}
         >
-          <Typography variant="h6">Open Sound Controller</Typography>
+          <Typography variant="h6">Allan's Web Music</Typography>
         </Link>
         {url && (
           <>

@@ -1,6 +1,6 @@
-import { GmPreset } from "./GmSynth";
+import { FmPreset } from ".";
 
-export const GM_INSTRUMENTS: GmPreset[] = [
+export const FM_INSTRUMENTS: FmPreset[] = [
   {
     name: "Basic",
     gain: 1.0,

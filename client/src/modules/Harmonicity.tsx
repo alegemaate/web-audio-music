@@ -10,55 +10,58 @@ import {
   Typography,
   CardActions,
 } from "@material-ui/core";
-import { GmPreset, GmSynth } from "./GmSynth";
-import { rangeMap } from "./helpers";
 
-export const HarmonicityTest: React.FC<RouteComponentProps> = () => {
-  const [gmSynth, setGmSynth] = React.useState<GmSynth | null>(null);
-  const [preset, setPreset] = React.useState<GmPreset>({
-    gain: 1.0,
-    op1: {
-      ratio: 1,
-      dest: "out",
-      feedback: 0,
-      level: 1.0,
-      type: "sine",
-      adsr: {
-        attackLevel: 1.0,
-        attackTime: 0.1,
-        decayLevel: 0.8,
-        decayTime: 0.1,
-        sustainLevel: 0.5,
-        sustainTime: 0.2,
-        releaseLevel: 0.0,
-        releaseTime: 0.3,
-      },
+import { FmPreset, FmSynth } from "../components/FmSynth";
+import { rangeMap } from "../helpers/helpers";
+
+const DEFAULT_PRESET: FmPreset = {
+  gain: 1.0,
+  op1: {
+    ratio: 1,
+    dest: "out",
+    feedback: 0,
+    level: 1.0,
+    type: "sine",
+    adsr: {
+      attackLevel: 1.0,
+      attackTime: 0.1,
+      decayLevel: 0.8,
+      decayTime: 0.1,
+      sustainLevel: 0.5,
+      sustainTime: 0.2,
+      releaseLevel: 0.0,
+      releaseTime: 0.3,
     },
-    op2: {
-      ratio: 1,
-      dest: "op1",
-      feedback: 0,
-      level: 1000.0,
-      type: "sine",
-      adsr: {
-        attackLevel: 1.0,
-        attackTime: 0.1,
-        decayLevel: 0.8,
-        decayTime: 0.1,
-        sustainLevel: 0.5,
-        sustainTime: 0.2,
-        releaseLevel: 0.0,
-        releaseTime: 0.3,
-      },
+  },
+  op2: {
+    ratio: 1,
+    dest: "op1",
+    feedback: 0,
+    level: 1000.0,
+    type: "sine",
+    adsr: {
+      attackLevel: 1.0,
+      attackTime: 0.1,
+      decayLevel: 0.8,
+      decayTime: 0.1,
+      sustainLevel: 0.5,
+      sustainTime: 0.2,
+      releaseLevel: 0.0,
+      releaseTime: 0.3,
     },
-  });
+  },
+};
+
+export const Harmonicity: React.FC<RouteComponentProps> = () => {
+  const [fmSynth, setFmSynth] = React.useState<FmSynth | null>(null);
+  const [preset, setPreset] = React.useState<FmPreset>(DEFAULT_PRESET);
 
   const playNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    if (!gmSynth) {
-      setGmSynth(new GmSynth());
+    if (!fmSynth) {
+      setFmSynth(new FmSynth());
       return;
     }
-    gmSynth.changeInstrument(preset);
+    fmSynth.changeInstrument(preset);
     const bounding = event.currentTarget.getBoundingClientRect();
     const freq = rangeMap(
       event.clientX - bounding.x,
@@ -67,15 +70,15 @@ export const HarmonicityTest: React.FC<RouteComponentProps> = () => {
       50,
       2000
     );
-    gmSynth.play(freq);
+    fmSynth.play(freq);
   };
 
   const stopNote = () => {
-    if (!gmSynth) {
+    if (!fmSynth) {
       return;
     }
 
-    gmSynth.stop();
+    fmSynth.stop();
   };
 
   return (

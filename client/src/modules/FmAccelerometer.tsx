@@ -8,15 +8,16 @@ import {
   Slider,
 } from "@material-ui/core";
 import { VolumeUp, Waves } from "@material-ui/icons";
-import { AccelPad, AccelParams } from "./AccelPad";
-import { rangeMap } from "./helpers";
+
+import { AccelPad, AccelParams } from "../components/AccelPad";
+import { rangeMap } from "../helpers/helpers";
 
 const MAX_GAIN_1 = 10000;
 const MAX_GAIN_2 = 1000;
 const MAX_FREQUENCY_1 = 1000;
 const MAX_FREQUENCY_2 = 20;
 
-export const FmSynth: React.FC<RouteComponentProps> = () => {
+export const FmAccelerometer: React.FC<RouteComponentProps> = () => {
   const [mod1, setMod1] = React.useState<OscillatorNode | null>(null);
   const [mod2, setMod2] = React.useState<OscillatorNode | null>(null);
   const [gain1, setGain1] = React.useState<GainNode | null>(null);

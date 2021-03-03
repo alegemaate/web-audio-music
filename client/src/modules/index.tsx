@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Equalizer, Home } from "@material-ui/icons";
 
-import ImgLandscape from "./images/landscape.jpg";
-import ImgBloom from "./images/bloom.png";
-import ImgGmSynth from "./images/gmsynth.png";
-import ImgFmSynth from "./images/fmsynth.png";
+import ImgLandscape from "../images/landscape.jpg";
+import ImgBloom from "../images/bloom.png";
+import ImgTwoOpFmSynth from "../images/gmsynth.png";
+import ImgFmSynth from "../images/fmsynth.png";
 
 type ModuleType = {
   name: string;
@@ -25,7 +25,7 @@ export const MODULES: ModuleType[] = [
   },
   {
     name: "Bloom",
-    link: "/osc-controller/bloom",
+    link: "/osc-controller/osc-bloom",
     icon: <Equalizer />,
     image: ImgBloom,
     dashboard: true,
@@ -33,7 +33,7 @@ export const MODULES: ModuleType[] = [
   },
   {
     name: "Accelerometer Control",
-    link: "/osc-controller/accel",
+    link: "/osc-controller/osc-accelerometer",
     icon: <Equalizer />,
     image: ImgLandscape,
     dashboard: true,
@@ -41,7 +41,7 @@ export const MODULES: ModuleType[] = [
   },
   {
     name: "FM Accelerometer",
-    link: "/osc-controller/fmsynth",
+    link: "/osc-controller/fm-synth-accelerometer",
     icon: <Equalizer />,
     image: ImgFmSynth,
     dashboard: true,
@@ -49,9 +49,9 @@ export const MODULES: ModuleType[] = [
   },
   {
     name: "2 Op FM Synth",
-    link: "/osc-controller/gmsynth",
+    link: "/osc-controller/fm-synth-controller",
     icon: <Equalizer />,
-    image: ImgGmSynth,
+    image: ImgTwoOpFmSynth,
     dashboard: true,
     description: "GM implementation in FM",
   },
@@ -70,5 +70,13 @@ export const MODULES: ModuleType[] = [
     image: ImgLandscape,
     dashboard: true,
     description: "Draw waveform using canvas",
+  },
+  {
+    name: "Guided Music",
+    link: "/osc-controller/guided-music",
+    icon: <Equalizer />,
+    image: ImgLandscape,
+    dashboard: true,
+    description: "Living composition",
   },
 ];

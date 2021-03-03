@@ -14,23 +14,24 @@ import {
   CardActions,
   TextField,
 } from "@material-ui/core";
-import { GmPreset, GmSynth } from "./GmSynth";
-import { GM_INSTRUMENTS } from "./gmInstruments";
-import { rangeMap } from "./helpers";
 
-export const GmTest: React.FC<RouteComponentProps> = () => {
-  const [gmSynth, setGmSynth] = React.useState<GmSynth | null>(null);
-  const [preset, setPreset] = React.useState<GmPreset>(GM_INSTRUMENTS[0]);
+import { FmPreset, FmSynth, FM_INSTRUMENTS } from "../components/FmSynth";
+import { rangeMap } from "../helpers/helpers";
+import { Oscilloscope } from "../components/Oscilloscope";
+
+export const FmSynthController: React.FC<RouteComponentProps> = () => {
+  const [fmSynth, setFmSynth] = React.useState<FmSynth | null>(null);
+  const [preset, setPreset] = React.useState<FmPreset>(FM_INSTRUMENTS[0]);
   const [copied, setCopied] = React.useState(false);
   const [presetText, setPresetText] = React.useState("");
   const [presetError, setPresetError] = React.useState("");
 
   const playNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    if (!gmSynth) {
-      setGmSynth(new GmSynth());
+    if (!fmSynth) {
+      setFmSynth(new FmSynth());
       return;
     }
-    gmSynth.changeInstrument(preset);
+    fmSynth.changeInstrument(preset);
     const bounding = event.currentTarget.getBoundingClientRect();
     const freq = rangeMap(
       event.clientX - bounding.x,
@@ -39,19 +40,19 @@ export const GmTest: React.FC<RouteComponentProps> = () => {
       50,
       2000
     );
-    gmSynth.play(freq);
+    fmSynth.play(freq);
   };
 
   const stopNote = () => {
-    if (!gmSynth) {
+    if (!fmSynth) {
       return;
     }
 
-    gmSynth.stop();
+    fmSynth.stop();
   };
 
   const reset = () => {
-    setPreset(GM_INSTRUMENTS[0]);
+    setPreset(FM_INSTRUMENTS[0]);
   };
 
   const copyPreset = async () => {
@@ -171,6 +172,7 @@ export const GmTest: React.FC<RouteComponentProps> = () => {
                 Reset
               </Button>
             </CardActions>
+            <Oscilloscope analyser={fmSynth?.getAnalyser()} />
           </Card>
         </Grid>
 
@@ -185,7 +187,7 @@ export const GmTest: React.FC<RouteComponentProps> = () => {
                 style={{ marginBottom: 16 }}
                 onChange={(event) => {
                   if (typeof event.target.value === "number") {
-                    setPreset(GM_INSTRUMENTS[event.target.value]);
+                    setPreset(FM_INSTRUMENTS[event.target.value]);
                   }
                 }}
                 defaultValue={0}
@@ -196,9 +198,9 @@ export const GmTest: React.FC<RouteComponentProps> = () => {
                 <MenuItem value={-1} disabled>
                   Select a preset
                 </MenuItem>
-                {GM_INSTRUMENTS.map((preset, index) => (
-                  <MenuItem value={index}>
-                    {preset?.name ?? `Preset ${index}`}
+                {FM_INSTRUMENTS.map((preset, index) => (
+                  <MenuItem value={index} key={index}>
+                    {preset.name ?? `Preset ${index}`}
                   </MenuItem>
                 ))}
               </Select>
@@ -247,8 +249,8 @@ export const GmTest: React.FC<RouteComponentProps> = () => {
 
 const OpPreset: React.FC<{
   op: "op1" | "op2";
-  preset: GmPreset;
-  setPreset: React.Dispatch<React.SetStateAction<GmPreset>>;
+  preset: FmPreset;
+  setPreset: React.Dispatch<React.SetStateAction<FmPreset>>;
 }> = ({ preset, setPreset, op }) => {
   return (
     <Card>
@@ -347,7 +349,7 @@ const OpPreset: React.FC<{
           step={0.01}
         />
 
-        <InputLabel>Feedback</InputLabel>
+        <InputLabel>Feedback (Does not work on some browsers)</InputLabel>
         <Slider
           valueLabelDisplay="auto"
           value={preset[op].feedback}

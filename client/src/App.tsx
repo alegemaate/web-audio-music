@@ -3,15 +3,17 @@ import { Router } from "@reach/router";
 import { Box, Container, makeStyles } from "@material-ui/core";
 
 import { ConnectForm } from "./ConnectForm";
-import { Bloom } from "./Bloom";
-import { Accelerometer } from "./Accelerometer";
 import { Dashboard } from "./Dashboard";
 import { AppDrawer } from "./AppDrawer";
 import { AppTopBar } from "./AppTopBar";
-import { FmSynth } from "./FmSynth";
-import { GmTest } from "./GmTest";
-import { HarmonicityTest } from "./HarmonicityTest";
-import { WaveformDraw } from "./WaveformDraw";
+
+import { OscBloom } from "./modules/OscBloom";
+import { OscAccelerometer } from "./modules/OscAccelerometer";
+import { FmAccelerometer } from "./modules/FmAccelerometer";
+import { FmSynthController } from "./modules/FmSynthController";
+import { Harmonicity } from "./modules/Harmonicity";
+import { WaveformDraw } from "./modules/WaveformDraw";
+import { GuidedMusic } from "./modules/GuidedMusic";
 
 export type WsArgs = {
   address: string;
@@ -109,12 +111,13 @@ const App: React.FC = () => {
         <Box maxWidth="md" mt={4}>
           <Router basepath="/osc-controller">
             <Dashboard path="/" />
-            <Bloom path="/bloom" onTransmit={playNote} />
-            <Accelerometer path="/accel" onTransmit={playNote} />
-            <FmSynth path="/fmsynth" />
-            <GmTest path="/gmsynth" />
-            <HarmonicityTest path="/harmonicity" />
+            <OscBloom path="/osc-bloom" onTransmit={playNote} />
+            <OscAccelerometer path="/osc-accelerometer" onTransmit={playNote} />
+            <FmAccelerometer path="/fm-synth-accelerometer" />
+            <FmSynthController path="/fm-synth-controller" />
+            <Harmonicity path="/harmonicity" />
             <WaveformDraw path="/waveform" />
+            <GuidedMusic path="/guided-music" />
           </Router>
         </Box>
       </Container>

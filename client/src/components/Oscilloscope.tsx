@@ -24,16 +24,19 @@ export const Oscilloscope: React.FC<{ analyser?: AnalyserNode }> = ({
         return;
       }
 
+      // Setup draw
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.fillRect(0, 0, oscRef.current.width, oscRef.current.height);
-
-      if (!analyser) {
-        return;
-      }
-
       ctx.lineWidth = 2;
       ctx.strokeStyle = "rgb(255, 255, 255)";
       ctx.beginPath();
+
+      if (!analyser) {
+        ctx.moveTo(0, oscRef.current.height / 2);
+        ctx.lineTo(oscRef.current.width, oscRef.current.height / 2);
+        ctx.stroke();
+        return;
+      }
 
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
@@ -65,7 +68,7 @@ export const Oscilloscope: React.FC<{ analyser?: AnalyserNode }> = ({
         cancelAnimationFrame(requestId);
       }
     };
-  }, [analyser, oscRef]);
+  }, [analyser, oscRef, width]);
 
   return (
     <div ref={parentRef} style={{ width: "100%" }}>

@@ -8,8 +8,9 @@ import {
 import { Timelapse, Timer } from "@material-ui/icons";
 import { RouteComponentProps } from "@reach/router";
 import React from "react";
-import { WsArgs } from "./App";
-import { rangeMap } from "./helpers";
+
+import { WsArgs } from "../App";
+import { rangeMap } from "../helpers/helpers";
 
 export type ClickHistory = {
   x: number;
@@ -46,7 +47,7 @@ const ClickDot: React.FC<{
   );
 };
 
-export const Bloom: React.FC<
+export const OscBloom: React.FC<
   RouteComponentProps & { onTransmit: (args: WsArgs) => void }
 > = ({ onTransmit }) => {
   const [clickHistory, setClickHistory] = React.useState<ClickHistory[]>([]);
