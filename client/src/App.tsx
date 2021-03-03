@@ -10,6 +10,8 @@ import { AppDrawer } from "./AppDrawer";
 import { AppTopBar } from "./AppTopBar";
 import { FmSynth } from "./FmSynth";
 import { GmTest } from "./GmTest";
+import { HarmonicityTest } from "./HarmonicityTest";
+import { WaveformDraw } from "./WaveformDraw";
 
 export type WsArgs = {
   address: string;
@@ -27,6 +29,7 @@ const App: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [connectOpen, setConnectOpen] = React.useState(false);
 
   const classes = useStyles();
 
@@ -57,6 +60,7 @@ const App: React.FC = () => {
       console.log("WebSocket Client Connected", connection);
       setLoading(false);
       setClient(ws);
+      setConnectOpen(false);
       window.localStorage.setItem("wssurl", url);
     };
 
@@ -88,6 +92,7 @@ const App: React.FC = () => {
   return (
     <div className={classes.root} style={{ userSelect: "none" }}>
       <AppTopBar
+        onConnect={() => setConnectOpen(true)}
         onDisconnect={handleDisconnect}
         toggleDrawer={toggleDrawer}
         url={client?.url}
@@ -96,8 +101,9 @@ const App: React.FC = () => {
       <ConnectForm
         loading={loading}
         onSubmit={connectWebsocket}
-        open={!!client}
+        open={connectOpen}
         error={error}
+        onClose={() => setConnectOpen(false)}
       />
       <Container maxWidth="md">
         <Box maxWidth="md" mt={4}>
@@ -107,6 +113,8 @@ const App: React.FC = () => {
             <Accelerometer path="/accel" onTransmit={playNote} />
             <FmSynth path="/fmsynth" />
             <GmTest path="/gmsynth" />
+            <HarmonicityTest path="/harmonicity" />
+            <WaveformDraw path="/waveform" />
           </Router>
         </Box>
       </Container>

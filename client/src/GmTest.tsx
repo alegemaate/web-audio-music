@@ -180,6 +180,38 @@ export const GmTest: React.FC<RouteComponentProps> = () => {
               <Typography variant="h5">Presets</Typography>
             </CardContent>
             <CardActions>
+              <Select
+                variant="outlined"
+                style={{ marginBottom: 16 }}
+                onChange={(event) => {
+                  if (typeof event.target.value === "number") {
+                    setPreset(GM_INSTRUMENTS[event.target.value]);
+                  }
+                }}
+                defaultValue={0}
+                fullWidth
+                placeholder="Select a preset"
+                color="primary"
+              >
+                <MenuItem value={-1} disabled>
+                  Select a preset
+                </MenuItem>
+                {GM_INSTRUMENTS.map((preset, index) => (
+                  <MenuItem value={index}>
+                    {preset?.name ?? `Preset ${index}`}
+                  </MenuItem>
+                ))}
+              </Select>
+            </CardActions>
+          </Card>
+        </Grid>
+
+        <Grid xs={12} item>
+          <Card>
+            <CardContent>
+              <Typography variant="h5">Share</Typography>
+            </CardContent>
+            <CardActions>
               <Button
                 onClick={copyPreset}
                 variant="outlined"

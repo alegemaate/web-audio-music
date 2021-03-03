@@ -68,10 +68,6 @@ export const FmSynth: React.FC<RouteComponentProps> = () => {
     const mainGain = context.createGain();
     mainGain.gain.value = 0.5;
 
-    // Modulation index
-    // Harmonicity ratio
-    // barry truaxs
-
     // Wiring everything up
     mod1.connect(mod1Gain);
     mod2.connect(mod2Gain);

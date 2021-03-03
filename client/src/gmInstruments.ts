@@ -2,6 +2,7 @@ import { GmPreset } from "./GmSynth";
 
 export const GM_INSTRUMENTS: GmPreset[] = [
   {
+    name: "Basic",
     gain: 1.0,
     op1: {
       dest: "out",
@@ -39,6 +40,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
     },
   },
   {
+    name: "Basic 2",
     gain: 1.0,
     op1: {
       dest: "out",
@@ -76,6 +78,7 @@ export const GM_INSTRUMENTS: GmPreset[] = [
     },
   },
   {
+    name: "Abrasive Synth",
     gain: 1.0,
     op1: {
       dest: "out",
@@ -112,9 +115,8 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       },
     },
   },
-
-  // Flute
   {
+    name: "Flute",
     gain: 1.0,
     op1: {
       dest: "out",
@@ -151,9 +153,8 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       },
     },
   },
-
-  // Brass
   {
+    name: "Brass",
     gain: 1.0,
     op1: {
       dest: "out",
@@ -190,9 +191,8 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       },
     },
   },
-
-  // Bass
   {
+    name: "Bass",
     gain: 1.0,
     op1: {
       dest: "out",
@@ -229,8 +229,8 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       },
     },
   },
-  // Bell
   {
+    name: "Bell",
     gain: 1.0,
     op1: {
       dest: "out",
@@ -267,8 +267,8 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       },
     },
   },
-  // Guitar
   {
+    name: "Guitar",
     gain: 1.0,
     op1: {
       dest: "out",
@@ -305,8 +305,8 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       },
     },
   },
-  // Piano
   {
+    name: "E Piano",
     gain: 1.0,
     op1: {
       dest: "out",
@@ -343,8 +343,8 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       },
     },
   },
-  // Piano 2
   {
+    name: "E Piano 2",
     gain: 1.0,
     op1: {
       dest: "out",
@@ -381,8 +381,8 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       },
     },
   },
-  // Snare
   {
+    name: "Snare Drum",
     gain: 1.0,
     op1: {
       dest: "out",
@@ -419,9 +419,8 @@ export const GM_INSTRUMENTS: GmPreset[] = [
       },
     },
   },
-
-  // Hat
   {
+    name: "High Hat",
     gain: 1.0,
     op1: {
       dest: "out",

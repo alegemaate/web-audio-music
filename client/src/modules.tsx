@@ -40,7 +40,7 @@ export const MODULES: ModuleType[] = [
     description: "Accelerometer controller for mobile devices.",
   },
   {
-    name: "FM Synth",
+    name: "FM Accelerometer",
     link: "/osc-controller/fmsynth",
     icon: <Equalizer />,
     image: ImgFmSynth,
@@ -48,11 +48,27 @@ export const MODULES: ModuleType[] = [
     description: "Attempt at a fm synthesizer",
   },
   {
-    name: "GM Synth",
+    name: "2 Op FM Synth",
     link: "/osc-controller/gmsynth",
     icon: <Equalizer />,
     image: ImgGmSynth,
     dashboard: true,
     description: "GM implementation in FM",
+  },
+  {
+    name: "Harmonicity Ratio",
+    link: "/osc-controller/harmonicity",
+    icon: <Equalizer />,
+    image: ImgLandscape,
+    dashboard: true,
+    description: "Harmonicity Ratio Playground",
+  },
+  {
+    name: "Waveform Draw",
+    link: "/osc-controller/waveform",
+    icon: <Equalizer />,
+    image: ImgLandscape,
+    dashboard: true,
+    description: "Draw waveform using canvas",
   },
 ];
