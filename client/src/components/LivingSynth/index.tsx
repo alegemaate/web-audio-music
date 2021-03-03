@@ -9,7 +9,8 @@ interface Operator {
 }
 
 const NUM_OSCS = 4;
-const STEP_TIME = 10000;
+const STEP_TIME = 2000;
+const SEQ_LENGTH = 4;
 
 const mtof = (midi: number) => {
   return Math.pow(2, (midi - 69) / 12) * 440;
@@ -29,6 +30,10 @@ export class LivingSynth {
   private interval: number;
 
   private chain: MarkovChain;
+
+  private readonly arpOp: Operator;
+
+  private step: number;
 
   public constructor() {
     // Create audio context
@@ -51,6 +56,23 @@ export class LivingSynth {
     this.gain.connect(this.convolver);
     this.convolver.connect(this.context.destination);
     this.gain.connect(this.analyser);
+
+    // Set up arp op
+    this.arpOp = {
+      osc: this.context.createOscillator(),
+      oscGain: this.context.createGain(),
+      lfo: this.context.createOscillator(),
+      panner: this.context.createStereoPanner(),
+    };
+    this.arpOp.osc.type = "triangle";
+    this.arpOp.osc.start();
+    this.arpOp.lfo.start();
+    this.arpOp.osc.connect(this.arpOp.oscGain);
+    this.arpOp.lfo.connect(this.arpOp.panner.pan);
+    this.arpOp.oscGain.connect(this.arpOp.panner);
+    this.arpOp.panner.connect(this.gain);
+    this.arpOp.oscGain.gain.value = 0.1;
+    this.arpOp.lfo.frequency.value = 0.1;
 
     // Operators is empty array (for now)
     this.operators = [];
@@ -110,6 +132,9 @@ export class LivingSynth {
       ],
       "C-M7"
     );
+
+    // Step
+    this.step = 0;
   }
 
   public start(): void {
@@ -123,19 +148,40 @@ export class LivingSynth {
 
   public evolve(): void {
     const chord = this.chain.next();
-    const notes = getChord(2, chord);
+
+    // Adjust transpose
+    const notes = getChord(24, chord);
     const now = this.context.currentTime;
 
     this.operators.forEach((op, i) => {
       op.osc.frequency.cancelScheduledValues(0);
       op.osc.frequency.setValueAtTime(op.osc.frequency.value, now);
+      // Try other interpolation
       op.osc.frequency.linearRampToValueAtTime(
         mtof(notes[i] ?? 0),
-        now + STEP_TIME / 1100.0
+        now + STEP_TIME / 11000.0
       );
     });
 
-    console.log(chord, notes);
+    // Arp op
+    this.arpOp.osc.frequency.cancelScheduledValues(0);
+    this.step += 1;
+
+    for (let i = 0; i < SEQ_LENGTH; i++) {
+      let nextNote = notes[Math.floor(Math.random() * notes.length)] ?? 0;
+      // Resolve on root
+      if (this.step % SEQ_LENGTH === 0) {
+        nextNote = notes[0] ?? 0;
+      }
+      console.log(nextNote);
+      const freq = mtof(nextNote + 24);
+      this.arpOp.osc.frequency.setValueAtTime(
+        freq,
+        now + (STEP_TIME / (1000.0 * SEQ_LENGTH)) * i
+      );
+    }
+
+    console.log(chord, notes, this.step % SEQ_LENGTH);
   }
 
   public getAnalyser(): AnalyserNode {
