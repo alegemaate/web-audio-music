@@ -19,7 +19,7 @@ const DEFAULT_SAMPLES = 20;
 
 const DEFAULT_PRESET: FmPreset = {
   name: "Basic",
-  gain: 1.0,
+  gain: 0.2,
   op1: {
     dest: "out",
     type: "sine",

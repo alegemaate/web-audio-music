@@ -1,4 +1,4 @@
-export const getChord = (octave: number, chord: string): number[] => {
+export const getChord = (transpose: number, chord: string): number[] => {
   const [key, type] = chord.split("-");
 
   if (!key || !type) {
@@ -8,7 +8,7 @@ export const getChord = (octave: number, chord: string): number[] => {
   let nums: number[] = getChordType(type);
   let offset = getChordOffset(key);
 
-  return nums.map((n) => n + 24 + octave * 12 + offset);
+  return nums.map((n) => n + 24 + transpose + offset);
 };
 
 const getChordOffset = (key: string) => {
