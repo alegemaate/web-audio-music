@@ -217,12 +217,4 @@ export class GmSynth {
       this.op2.stop();
     }
   }
-
-  public bundlePreset(): string {
-    return btoa(JSON.stringify(this.preset));
-  }
-
-  public unbundlePreset(code: string): GmPreset {
-    return JSON.parse(atob(code)) as GmPreset;
-  }
 }
