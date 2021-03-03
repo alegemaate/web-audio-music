@@ -1,5 +1,5 @@
 import React from "react";
-import { colorMap, rangeMap } from "./helpers";
+import { colorMap, rangeMap } from "../helpers/helpers";
 import GyroNorm from "gyronorm";
 import { Box, Button, Card, CardContent, Typography } from "@material-ui/core";
 import { Error } from "@material-ui/icons";

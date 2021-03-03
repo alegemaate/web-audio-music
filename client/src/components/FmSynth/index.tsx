@@ -1,6 +1,6 @@
-import { GM_INSTRUMENTS } from "./gmInstruments";
+import { FM_INSTRUMENTS } from "./instruments";
 
-interface GmAdsrPreset {
+interface FmAdsrPreset {
   attackLevel: number;
   attackTime: number;
   decayLevel: number;
@@ -11,7 +11,7 @@ interface GmAdsrPreset {
   releaseTime: number;
 }
 
-interface GmOpPreset {
+interface FmOpPreset {
   type: "sawtooth" | "sine" | "square" | "triangle" | "custom";
   custom?: {
     real: Float32Array;
@@ -19,19 +19,19 @@ interface GmOpPreset {
   };
   dest: "op1" | "op2" | "out" | "blackhole";
   ratio: number;
-  adsr: GmAdsrPreset;
+  adsr: FmAdsrPreset;
   feedback: number;
   level: number;
 }
 
-export interface GmPreset {
+export interface FmPreset {
   gain: number;
-  op1: GmOpPreset;
-  op2: GmOpPreset;
+  op1: FmOpPreset;
+  op2: FmOpPreset;
   name?: string;
 }
 
-export class GmSynth {
+export class FmSynth {
   private readonly context: AudioContext;
 
   private readonly gain: GainNode;
@@ -50,7 +50,7 @@ export class GmSynth {
 
   private readonly analyser: AnalyserNode;
 
-  private preset: GmPreset;
+  private preset: FmPreset;
 
   public constructor() {
     // Create audio context
@@ -78,9 +78,9 @@ export class GmSynth {
 
     // Wiring
     this.op1.connect(this.op1Gain);
-    this.op1.connect(this.op1Feedback).connect(this.op1.frequency);
+    this.op1.connect(this.op1Feedback);
     this.op2.connect(this.op2Gain);
-    this.op2.connect(this.op2Feedback).connect(this.op2.frequency);
+    this.op2.connect(this.op2Feedback);
     this.gain.connect(this.context.destination);
     this.gain.connect(this.analyser);
 
@@ -89,12 +89,12 @@ export class GmSynth {
     this.op2.start();
 
     // Setup preset
-    this.preset = GM_INSTRUMENTS[0];
+    this.preset = FM_INSTRUMENTS[0];
     this.changeInstrument(this.preset);
   }
 
   public programChange(instrument: number): void {
-    const preset = GM_INSTRUMENTS[instrument];
+    const preset = FM_INSTRUMENTS[instrument];
 
     if (!preset) {
       return;
@@ -103,7 +103,7 @@ export class GmSynth {
     this.changeInstrument(preset);
   }
 
-  public changeInstrument(preset: GmPreset): void {
+  public changeInstrument(preset: FmPreset): void {
     // Set preset
     this.preset = preset;
 
@@ -111,7 +111,6 @@ export class GmSynth {
     this.gain.gain.value = preset.gain;
 
     // Wave
-
     if (preset.op1.type === "custom" && preset.op1.custom) {
       const wave = this.context.createPeriodicWave(
         preset.op1.custom.real,
@@ -137,8 +136,18 @@ export class GmSynth {
     this.op2Gain.gain.value = 0.0;
 
     // Feedback
+    this.op1Feedback.disconnect();
+    this.op2Feedback.disconnect();
+
     this.op1Feedback.gain.value = preset.op1.feedback;
     this.op2Feedback.gain.value = preset.op2.feedback;
+
+    if (preset.op1.feedback > 0) {
+      this.op1Feedback.connect(this.op1.frequency);
+    }
+    if (preset.op2.feedback > 0) {
+      this.op2Feedback.connect(this.op2.frequency);
+    }
 
     // Op 1 wiring
     this.op1Gain.disconnect();
@@ -252,3 +261,5 @@ export class GmSynth {
     return this.analyser;
   }
 }
+
+export { FM_INSTRUMENTS };

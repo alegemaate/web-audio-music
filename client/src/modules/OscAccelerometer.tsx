@@ -1,9 +1,10 @@
 import React from "react";
-import { WsArgs } from "./App";
 import { RouteComponentProps } from "@reach/router";
-import { AccelPad, AccelParams } from "./AccelPad";
 
-export const Accelerometer: React.FC<
+import { WsArgs } from "../App";
+import { AccelPad, AccelParams } from "../components/AccelPad";
+
+export const OscAccelerometer: React.FC<
   RouteComponentProps & {
     onTransmit: (args: WsArgs) => void;
   }
