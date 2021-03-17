@@ -5,7 +5,7 @@ interface Operator {
   panner: StereoPannerNode;
 }
 
-const NUM_OSCS = 4;
+const NUM_OSCS = 10;
 
 export class ChordSynth {
   private readonly context: AudioContext;
@@ -48,16 +48,21 @@ export class ChordSynth {
     }
   }
 
-  public play(notes: number[], duration: number): void {
+  public play(notes: number[][], duration: number): void {
     const now = this.context.currentTime;
 
     this.operators.forEach((op, i) => {
-      op.osc.frequency.cancelScheduledValues(0);
-      op.osc.frequency.setValueAtTime(op.osc.frequency.value, now);
-      op.osc.frequency.linearRampToValueAtTime(
-        notes[i] ?? 0,
-        now + duration / 10000
-      );
+      if (notes[i]) {
+        op.oscGain.gain.value = 1.0;
+        op.osc.frequency.cancelScheduledValues(0);
+        op.osc.frequency.setValueAtTime(op.osc.frequency.value, now);
+        op.osc.frequency.linearRampToValueAtTime(
+          notes[i][0],
+          now + duration / 5000
+        );
+      } else {
+        op.oscGain.gain.value = 0;
+      }
     });
   }
 }

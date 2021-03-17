@@ -14,26 +14,29 @@ import { Controller } from "../components/LivingSynth/Controller";
 import { Oscilloscope } from "../components/Oscilloscope";
 import { SCALES } from "../components/LivingSynth/scales";
 import { useAudioContext } from "../hooks/useAudioContext";
+import { GameOfLife } from "../components/GameOfLife";
 
 export const GuidedMusic: React.FC<RouteComponentProps> = () => {
-  const [fmSynth, setFmSynth] = React.useState<Controller | null>(null);
   const context = useAudioContext();
 
+  const [fmSynth, setFmSynth] = React.useState<Controller | null>(null);
+  const [paused, setPaused] = React.useState(true);
+
   const startSynth = () => {
-    if (!fmSynth) {
-      const synth = new Controller(context);
-      synth.start();
-      setFmSynth(synth);
-      return;
+    if (context.state === "suspended") {
+      context.resume();
     }
 
-    // Set synth
-    fmSynth.start();
+    if (!fmSynth) {
+      setFmSynth(new Controller(context));
+    }
+
+    setPaused(!paused);
   };
 
   return (
     <Card>
-      <Button onClick={startSynth}>{fmSynth ? "Restart" : "Start"}</Button>
+      <Button onClick={startSynth}>{paused ? "Start" : "Stop"}</Button>
       <Oscilloscope createAnalyser={fmSynth?.createAnalyser.bind(fmSynth)} />
       <CardContent>
         <Typography variant="h5">Configure</Typography>
@@ -62,6 +65,17 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
           ))}
         </Select>
       </CardActions>
+      <GameOfLife
+        width={12}
+        height={12}
+        cellSize={50}
+        paused={paused}
+        onChange={(arr) => {
+          if (fmSynth) {
+            fmSynth.evolve(arr);
+          }
+        }}
+      />
     </Card>
   );
 };

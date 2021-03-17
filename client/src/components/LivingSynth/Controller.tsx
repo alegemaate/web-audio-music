@@ -1,13 +1,49 @@
 import { ChordSynth } from "./ChordSynth";
-import { getChord } from "./chords";
 import { MarkovChain } from "./markovChain";
 import { SCALES } from "./scales";
-import { FmSynth, FM_INSTRUMENTS } from "../FmSynth";
-
-const STEP_TIME = 500;
+import { FmPreset, FmSynth } from "../FmSynth";
 
 const mtof = (midi: number) => {
   return Math.pow(2, (midi - 69) / 12) * 440;
+};
+
+const PRESET: FmPreset = {
+  name: "Basic",
+  gain: 0.2,
+  op1: {
+    dest: "out",
+    type: "sine",
+    ratio: 1.0,
+    feedback: 0.0,
+    level: 1.0,
+    adsr: {
+      attackLevel: 0.0,
+      attackTime: 0.01,
+      decayLevel: 0.7,
+      decayTime: 0.01,
+      sustainLevel: 0.7,
+      sustainTime: 7.0,
+      releaseLevel: 0.0,
+      releaseTime: 0.0,
+    },
+  },
+  op2: {
+    dest: "op1",
+    type: "sine",
+    ratio: 0.5,
+    feedback: 0.0,
+    level: 500.0,
+    adsr: {
+      attackLevel: 0.0,
+      attackTime: 0.01,
+      decayLevel: 1.0,
+      decayTime: 0.01,
+      sustainLevel: 8.0,
+      sustainTime: 0.0,
+      releaseLevel: 0.0,
+      releaseTime: 0.0,
+    },
+  },
 };
 
 export class Controller {
@@ -17,15 +53,15 @@ export class Controller {
 
   private readonly convolver: ConvolverNode;
 
-  private interval: number;
-
-  private chordChain: MarkovChain;
+  private scaleChain: MarkovChain;
 
   private chords: ChordSynth;
 
   private leadSynth: FmSynth;
 
   private scale: number[];
+
+  private preset: FmPreset = PRESET;
 
   public constructor(context: AudioContext) {
     // Create audio context
@@ -48,79 +84,80 @@ export class Controller {
 
     // Create lead synth component
     this.leadSynth = new FmSynth(this.context, this.gain);
-    this.leadSynth.changeInstrument(FM_INSTRUMENTS[3]);
+    this.leadSynth.changeInstrument(this.preset);
 
-    // No interval
-    this.interval = -1;
-
-    // Setup chordChain
-    this.chordChain = new MarkovChain(
+    // Setup scaleChain
+    this.scaleChain = new MarkovChain(
       [
         {
-          current: "C-M7",
-          next: "F-M7",
+          current: "acoustic",
+          next: "aeolian",
         },
         {
-          current: "C-M7",
-          next: "F-M7",
+          current: "aeolian",
+          next: "algerian",
         },
         {
-          current: "F-M7",
-          next: "C-M7",
+          current: "algerian",
+          next: "augmented",
         },
         {
-          current: "F-M7",
-          next: "E-m7",
+          current: "bkyes",
+          next: "chromatic",
         },
         {
-          current: "E-m7",
-          next: "D-M7",
+          current: "algerian",
+          next: "bkyes",
         },
         {
-          current: "D-M7",
-          next: "F-M7",
+          current: "chromatic",
+          next: "yo",
         },
         {
-          current: "D-M7",
-          next: "C-M7",
+          current: "yo",
+          next: "acoustic",
         },
       ],
-      "C-M7"
+      "acoustic"
     );
 
     // Initial scale
-    this.scale = SCALES.major_pentatonic;
+    this.scale = SCALES[this.scaleChain.next()];
   }
 
-  public start(): void {
-    if (this.interval !== -1) {
-      window.clearInterval(this.interval);
-      this.interval = -1;
-    }
-    this.interval = window.setInterval(this.evolve.bind(this), STEP_TIME);
-    this.evolve();
-  }
-
-  public evolve(): void {
+  public evolve(data: number[][]): void {
     // Get chord
-    const chord = getChord(24, this.chordChain.next());
+    // this.scale = SCALES[this.scaleChain.next()];
+
+    const data_chord = data.map((arr) => arr.reduce((i, c) => c + i, 0));
 
     // Adjust transpose
-    const frequencies = chord.map(mtof);
+    const notes = data_chord.flatMap((val, index) => {
+      if (val === 0) {
+        return [];
+      }
+
+      switch (index) {
+        case 0:
+          this.preset.op2.level = val * 200;
+          break;
+        case 1:
+          this.preset.op2.ratio = val * 1.0;
+          break;
+      }
+
+      return [[mtof(this.scale[index % this.scale.length] + 60), val]];
+    });
 
     // Chords
-    this.chords.play(frequencies, STEP_TIME);
+    this.chords.play(notes, 10);
 
     // Random note in scale
-    const leadNote =
-      this.scale[Math.floor(Math.random() * this.scale.length)] + 24;
-    this.leadSynth.play(mtof(leadNote + chord[0]));
-
-    console.log(chord, frequencies, leadNote);
+    this.leadSynth.play(notes[0]?.[0] ?? 0);
+    this.leadSynth.changeInstrument(this.preset);
   }
 
   public setScale(scale: number[]): void {
-    console.log(scale);
     this.scale = scale;
   }
 
