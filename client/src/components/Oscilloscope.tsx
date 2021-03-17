@@ -1,17 +1,30 @@
 import * as React from "react";
 
-export const Oscilloscope: React.FC<{ analyser?: AnalyserNode }> = ({
-  analyser,
-}) => {
+export const Oscilloscope: React.FC<{
+  createAnalyser?: () => AnalyserNode;
+}> = ({ createAnalyser }) => {
   const oscRef = React.useRef<HTMLCanvasElement>(null);
   const parentRef = React.useRef<HTMLDivElement>(null);
   const [width, setWidth] = React.useState(0);
+  const [analyser, setAnalyser] = React.useState<AnalyserNode | null>(null);
 
   React.useEffect(() => {
     if (parentRef.current) {
       setWidth(parentRef.current.clientWidth);
     }
   }, [parentRef]);
+
+  React.useEffect(() => {
+    if (!createAnalyser) {
+      return;
+    }
+    setAnalyser((analyser) => {
+      if (analyser) {
+        analyser.disconnect();
+      }
+      return createAnalyser();
+    });
+  }, [createAnalyser]);
 
   React.useEffect(() => {
     const render = () => {

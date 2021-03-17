@@ -13,6 +13,7 @@ import {
 import { FmPreset, FmSynth } from "../components/FmSynth";
 import { Oscilloscope } from "../components/Oscilloscope";
 import { DotDraw } from "../components/DotDraw";
+import { useAudioContext } from "../hooks/useAudioContext";
 
 const CANVAS_HEIGHT = 300;
 const DEFAULT_SAMPLES = 20;
@@ -103,11 +104,15 @@ const getFourierPreset = (
 };
 
 export const WaveformDraw: React.FC<RouteComponentProps> = () => {
+  const context = useAudioContext();
+
   const [points, setPoints] = React.useState({
     real: new Float32Array(DEFAULT_SAMPLES),
     imag: new Float32Array(DEFAULT_SAMPLES),
   });
-  const [fmSynth, setFmSynth] = React.useState<FmSynth | null>(null);
+  const [fmSynth] = React.useState<FmSynth>(
+    new FmSynth(context, context.destination)
+  );
   const [freq, setFreq] = React.useState(440);
 
   React.useEffect(() => {
@@ -128,9 +133,6 @@ export const WaveformDraw: React.FC<RouteComponentProps> = () => {
   }, [points, freq, fmSynth]);
 
   const stopNote = () => {
-    if (!fmSynth) {
-      return;
-    }
     fmSynth.stop();
   };
 
@@ -142,9 +144,10 @@ export const WaveformDraw: React.FC<RouteComponentProps> = () => {
   };
 
   const startSynth = () => {
-    if (!fmSynth) {
-      setFmSynth(new FmSynth());
+    if (context.state === "suspended") {
+      context.resume();
     }
+    fmSynth.play(freq);
   };
 
   return (
@@ -167,7 +170,7 @@ export const WaveformDraw: React.FC<RouteComponentProps> = () => {
           setPoints({ ...points, imag });
         }}
       />
-      <Oscilloscope analyser={fmSynth?.getAnalyser()} />
+      <Oscilloscope createAnalyser={fmSynth?.createAnalyser.bind(fmSynth)} />
       <CardActions>
         <Button
           onClick={startSynth}

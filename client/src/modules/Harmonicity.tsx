@@ -13,6 +13,7 @@ import {
 
 import { FmPreset, FmSynth } from "../components/FmSynth";
 import { rangeMap } from "../helpers/helpers";
+import { useAudioContext } from "../hooks/useAudioContext";
 
 const DEFAULT_PRESET: FmPreset = {
   gain: 1.0,
@@ -53,13 +54,16 @@ const DEFAULT_PRESET: FmPreset = {
 };
 
 export const Harmonicity: React.FC<RouteComponentProps> = () => {
-  const [fmSynth, setFmSynth] = React.useState<FmSynth | null>(null);
+  const context = useAudioContext();
+
+  const [fmSynth] = React.useState<FmSynth>(
+    new FmSynth(context, context.destination)
+  );
   const [preset, setPreset] = React.useState<FmPreset>(DEFAULT_PRESET);
 
   const playNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    if (!fmSynth) {
-      setFmSynth(new FmSynth());
-      return;
+    if (context.state === "suspended") {
+      context.resume();
     }
     fmSynth.changeInstrument(preset);
     const bounding = event.currentTarget.getBoundingClientRect();

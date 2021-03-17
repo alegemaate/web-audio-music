@@ -18,18 +18,22 @@ import {
 import { FmPreset, FmSynth, FM_INSTRUMENTS } from "../components/FmSynth";
 import { rangeMap } from "../helpers/helpers";
 import { Oscilloscope } from "../components/Oscilloscope";
+import { useAudioContext } from "../hooks/useAudioContext";
 
 export const FmSynthController: React.FC<RouteComponentProps> = () => {
-  const [fmSynth, setFmSynth] = React.useState<FmSynth | null>(null);
+  const context = useAudioContext();
+
+  const [fmSynth] = React.useState<FmSynth>(
+    new FmSynth(context, context.destination)
+  );
   const [preset, setPreset] = React.useState<FmPreset>(FM_INSTRUMENTS[0]);
   const [copied, setCopied] = React.useState(false);
   const [presetText, setPresetText] = React.useState("");
   const [presetError, setPresetError] = React.useState("");
 
   const playNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    if (!fmSynth) {
-      setFmSynth(new FmSynth());
-      return;
+    if (context.state === "suspended") {
+      context.resume();
     }
     fmSynth.changeInstrument(preset);
     const bounding = event.currentTarget.getBoundingClientRect();
@@ -44,10 +48,6 @@ export const FmSynthController: React.FC<RouteComponentProps> = () => {
   };
 
   const stopNote = () => {
-    if (!fmSynth) {
-      return;
-    }
-
     fmSynth.stop();
   };
 
@@ -172,7 +172,9 @@ export const FmSynthController: React.FC<RouteComponentProps> = () => {
                 Reset
               </Button>
             </CardActions>
-            <Oscilloscope analyser={fmSynth?.getAnalyser()} />
+            <Oscilloscope
+              createAnalyser={fmSynth.createAnalyser.bind(fmSynth)}
+            />
           </Card>
         </Grid>
 
