@@ -51,7 +51,7 @@ export class Controller {
 
   private readonly gain: GainNode;
 
-  private readonly convolver: ConvolverNode;
+  //private readonly convolver: ConvolverNode;
 
   private scaleChain: MarkovChain;
 
@@ -68,16 +68,15 @@ export class Controller {
     this.context = context;
 
     // Create convolver
-    this.convolver = this.context.createConvolver();
-    this.getImpulseBuffer("impulse.ogg");
+    //this.convolver = this.context.createConvolver();
+    //this.getImpulseBuffer("impulse.ogg");
 
     // Create gains
     this.gain = this.context.createGain();
     this.gain.gain.value = 0.1;
 
     // Wiring
-    this.gain.connect(this.convolver);
-    this.convolver.connect(this.context.destination);
+    this.gain.connect(this.context.destination);
 
     // Create chord component
     this.chords = new ChordSynth(this.context, this.gain);
@@ -137,15 +136,6 @@ export class Controller {
         return [];
       }
 
-      switch (index) {
-        case 0:
-          this.preset.op2.level = val * 200;
-          break;
-        case 1:
-          this.preset.op2.ratio = val * 1.0;
-          break;
-      }
-
       return [[mtof(this.scale[index % this.scale.length] + 60), val]];
     });
 
@@ -154,7 +144,15 @@ export class Controller {
 
     // Random note in scale
     this.leadSynth.play(notes[0]?.[0] ?? 0);
-    this.leadSynth.changeInstrument(this.preset);
+    // this.leadSynth.changeInstrument(this.preset);
+  }
+
+  public paramChange(x: number, y: number, z: number): void {
+    this.leadSynth.changeInstrument({
+      ...this.preset,
+      op1: { ...this.preset.op1, ratio: z / 100.0 },
+      op2: { ...this.preset.op2, level: x, ratio: y / 1000.0 },
+    });
   }
 
   public setScale(scale: number[]): void {
@@ -168,11 +166,11 @@ export class Controller {
     return analyser;
   }
 
-  private async getImpulseBuffer(impulseUrl: string): Promise<void> {
-    const buffer = await fetch(impulseUrl)
-      .then((response) => response.arrayBuffer())
-      .then((arrayBuffer) => this.context.decodeAudioData(arrayBuffer));
+  // private async getImpulseBuffer(impulseUrl: string): Promise<void> {
+  //   const buffer = await fetch(impulseUrl)
+  //     .then((response) => response.arrayBuffer())
+  //     .then((arrayBuffer) => this.context.decodeAudioData(arrayBuffer));
 
-    this.convolver.buffer = buffer;
-  }
+  //   this.convolver.buffer = buffer;
+  // }
 }

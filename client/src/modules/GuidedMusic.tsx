@@ -15,6 +15,7 @@ import { Oscilloscope } from "../components/Oscilloscope";
 import { SCALES } from "../components/LivingSynth/scales";
 import { useAudioContext } from "../hooks/useAudioContext";
 import { GameOfLife } from "../components/GameOfLife";
+import { CubeInput } from "../components/CubeInput";
 
 export const GuidedMusic: React.FC<RouteComponentProps> = () => {
   const context = useAudioContext();
@@ -32,6 +33,14 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
     }
 
     setPaused(!paused);
+  };
+
+  const handleCubeState = (x: number, y: number, z: number) => {
+    if (!fmSynth) {
+      return;
+    }
+
+    fmSynth.paramChange(x, y, z);
   };
 
   return (
@@ -76,6 +85,8 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
           }
         }}
       />
+
+      <CubeInput size={300} onChange={handleCubeState} />
     </Card>
   );
 };
