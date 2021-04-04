@@ -21,11 +21,9 @@ import { Oscilloscope } from "../components/Oscilloscope";
 import { useAudioContext } from "../hooks/useAudioContext";
 
 export const FmSynthController: React.FC<RouteComponentProps> = () => {
-  const context = useAudioContext();
+  const { context, analyser, gain } = useAudioContext();
 
-  const [fmSynth] = React.useState<FmSynth>(
-    new FmSynth(context, context.destination)
-  );
+  const [fmSynth] = React.useState<FmSynth>(() => new FmSynth(context, gain));
   const [preset, setPreset] = React.useState<FmPreset>(FM_INSTRUMENTS[0]);
   const [copied, setCopied] = React.useState(false);
   const [presetText, setPresetText] = React.useState("");
@@ -172,9 +170,7 @@ export const FmSynthController: React.FC<RouteComponentProps> = () => {
                 Reset
               </Button>
             </CardActions>
-            <Oscilloscope
-              createAnalyser={fmSynth.createAnalyser.bind(fmSynth)}
-            />
+            <Oscilloscope analyser={analyser} />
           </Card>
         </Grid>
 

@@ -1,7 +1,8 @@
-import { ChordSynth } from "./ChordSynth";
 import { MarkovChain } from "./markovChain";
 import { SCALES } from "./scales";
 import { FmPreset, FmSynth } from "../FmSynth";
+import { AdditiveSynth } from "../AdditiveSynth";
+import { DrumMachine } from "../DrumMachine";
 
 const mtof = (midi: number) => {
   return Math.pow(2, (midi - 69) / 12) * 440;
@@ -9,20 +10,20 @@ const mtof = (midi: number) => {
 
 const PRESET: FmPreset = {
   name: "Basic",
-  gain: 0.2,
+  gain: 0.1,
   op1: {
     dest: "out",
-    type: "sine",
-    ratio: 1.0,
+    type: "sawtooth",
+    ratio: 0.5,
     feedback: 0.0,
     level: 1.0,
     adsr: {
       attackLevel: 0.0,
-      attackTime: 0.01,
-      decayLevel: 0.7,
-      decayTime: 0.01,
-      sustainLevel: 0.7,
-      sustainTime: 7.0,
+      attackTime: 0.0,
+      decayLevel: 1.0,
+      decayTime: 0.0,
+      sustainLevel: 1.0,
+      sustainTime: 0.0,
       releaseLevel: 0.0,
       releaseTime: 0.0,
     },
@@ -30,15 +31,15 @@ const PRESET: FmPreset = {
   op2: {
     dest: "op1",
     type: "sine",
-    ratio: 0.5,
+    ratio: 0.0,
     feedback: 0.0,
-    level: 500.0,
+    level: 0.0,
     adsr: {
       attackLevel: 0.0,
-      attackTime: 0.01,
+      attackTime: 0.0,
       decayLevel: 1.0,
-      decayTime: 0.01,
-      sustainLevel: 8.0,
+      decayTime: 0.02,
+      sustainLevel: 1.0,
       sustainTime: 0.0,
       releaseLevel: 0.0,
       releaseTime: 0.0,
@@ -51,35 +52,41 @@ export class Controller {
 
   private readonly gain: GainNode;
 
-  //private readonly convolver: ConvolverNode;
-
   private scaleChain: MarkovChain;
 
-  private chords: ChordSynth;
+  private chords: AdditiveSynth[];
 
   private leadSynth: FmSynth;
+
+  private drumMachine: DrumMachine;
 
   private scale: number[];
 
   private preset: FmPreset = PRESET;
 
-  public constructor(context: AudioContext) {
+  public constructor(context: AudioContext, gain: GainNode) {
     // Create audio context
     this.context = context;
 
-    // Create convolver
-    //this.convolver = this.context.createConvolver();
-    //this.getImpulseBuffer("impulse.ogg");
-
     // Create gains
     this.gain = this.context.createGain();
-    this.gain.gain.value = 0.1;
+    this.gain.gain.value = 1.0;
 
     // Wiring
-    this.gain.connect(this.context.destination);
+    this.gain.connect(gain);
 
     // Create chord component
-    this.chords = new ChordSynth(this.context, this.gain);
+    this.chords = [];
+    this.chords.push(new AdditiveSynth(this.context, this.gain));
+    this.chords.push(new AdditiveSynth(this.context, this.gain));
+    this.chords.push(new AdditiveSynth(this.context, this.gain));
+    this.chords.push(new AdditiveSynth(this.context, this.gain));
+    this.chords.push(new AdditiveSynth(this.context, this.gain));
+    this.chords.push(new AdditiveSynth(this.context, this.gain));
+    this.chords.push(new AdditiveSynth(this.context, this.gain));
+    this.chords.push(new AdditiveSynth(this.context, this.gain));
+
+    this.drumMachine = new DrumMachine(context, gain);
 
     // Create lead synth component
     this.leadSynth = new FmSynth(this.context, this.gain);
@@ -101,12 +108,12 @@ export class Controller {
           next: "augmented",
         },
         {
-          current: "bkyes",
+          current: "blues",
           next: "chromatic",
         },
         {
           current: "algerian",
-          next: "bkyes",
+          next: "blues",
         },
         {
           current: "chromatic",
@@ -124,34 +131,55 @@ export class Controller {
     this.scale = SCALES[this.scaleChain.next()];
   }
 
-  public evolve(data: number[][]): void {
+  public evolve(data: number[]): void {
     // Get chord
     // this.scale = SCALES[this.scaleChain.next()];
 
-    const data_chord = data.map((arr) => arr.reduce((i, c) => c + i, 0));
-
     // Adjust transpose
-    const notes = data_chord.flatMap((val, index) => {
+    const notes = data.flatMap((val, index) => {
       if (val === 0) {
         return [];
       }
 
-      return [[mtof(this.scale[index % this.scale.length] + 60), val]];
+      return [mtof(this.scale[index % this.scale.length] + 48)];
     });
 
     // Chords
-    this.chords.play(notes, 10);
+    this.chords.forEach((op, i) => {
+      if (notes[i]) {
+        op.play(notes[i]);
+      } else {
+        op.play(0);
+      }
+    });
 
     // Random note in scale
-    this.leadSynth.play(notes[0]?.[0] ?? 0);
-    // this.leadSynth.changeInstrument(this.preset);
+    if (notes[0]) {
+      this.leadSynth.play(notes[0]);
+    }
   }
 
   public paramChange(x: number, y: number, z: number): void {
-    this.leadSynth.changeInstrument({
-      ...this.preset,
-      op1: { ...this.preset.op1, ratio: z / 100.0 },
-      op2: { ...this.preset.op2, level: x, ratio: y / 1000.0 },
+    this.preset.op1.adsr.attackTime = x;
+    this.preset.op1.adsr.decayTime = y;
+    this.preset.op1.adsr.releaseTime = z;
+    this.leadSynth.changeInstrument(this.preset);
+  }
+
+  public paramChange2(x: number, y: number, z: number): void {
+    this.preset.op2.level = x * 2000.0;
+    this.preset.op2.ratio = y * 10.0;
+    this.preset.op2.adsr.attackTime = z;
+    this.leadSynth.changeInstrument(this.preset);
+  }
+
+  public drums(data: number[]) {
+    this.drumMachine.play(data);
+  }
+
+  public setPoints(pts: { real: Float32Array; imag: Float32Array }): void {
+    this.chords.forEach((op) => {
+      op.setPoints(pts);
     });
   }
 
@@ -159,18 +187,27 @@ export class Controller {
     this.scale = scale;
   }
 
-  public createAnalyser(): AnalyserNode {
-    const analyser = this.context.createAnalyser();
-    analyser.fftSize = 256;
-    this.gain.connect(analyser);
-    return analyser;
+  public setPolyVol(vol: number): void {
+    this.chords.forEach((op) => {
+      op.setVol(vol);
+    });
   }
 
-  // private async getImpulseBuffer(impulseUrl: string): Promise<void> {
-  //   const buffer = await fetch(impulseUrl)
-  //     .then((response) => response.arrayBuffer())
-  //     .then((arrayBuffer) => this.context.decodeAudioData(arrayBuffer));
+  public setMonoVol(vol: number): void {
+    this.leadSynth.setVol(vol);
+  }
 
-  //   this.convolver.buffer = buffer;
-  // }
+  public setDrumVol(vol: number): void {
+    this.drumMachine.setVol(vol);
+  }
+
+  public setDrumDist(vol: number): void {
+    this.drumMachine.setDist(vol);
+  }
+
+  public setPolyDist(vol: number): void {
+    this.chords.forEach((op) => {
+      op.setDist(vol);
+    });
+  }
 }

@@ -102,11 +102,11 @@ export const DotDraw: React.FC<{
     if (typeof pts[x] === "number") {
       pts[x] = y;
     }
-    onChange(pts);
   };
 
   const handleMouseUp = () => {
     setDrawing(false);
+    onChange(points);
   };
 
   const handleMouseDown = (

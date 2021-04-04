@@ -54,11 +54,9 @@ const DEFAULT_PRESET: FmPreset = {
 };
 
 export const Harmonicity: React.FC<RouteComponentProps> = () => {
-  const context = useAudioContext();
+  const { context, gain } = useAudioContext();
 
-  const [fmSynth] = React.useState<FmSynth>(
-    new FmSynth(context, context.destination)
-  );
+  const [fmSynth] = React.useState<FmSynth>(new FmSynth(context, gain));
   const [preset, setPreset] = React.useState<FmPreset>(DEFAULT_PRESET);
 
   const playNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

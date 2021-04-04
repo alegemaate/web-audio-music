@@ -6,6 +6,8 @@ export type AccelParams = {
   gamma: number;
 };
 
+const PI_360 = Math.PI / 360;
+
 const getTransform = (x: number, y: number, z: number): string =>
   `translate3d(0px, 0px, -150px) rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
 
@@ -47,7 +49,11 @@ export const CubeInput: React.FC<{
       rotationZ.current
     );
 
-    onChange(rotationX.current, rotationY.current, rotationZ.current);
+    onChange(
+      Math.abs(Math.sin(rotationX.current * PI_360)),
+      Math.abs(Math.sin(rotationY.current * PI_360)),
+      Math.abs(Math.sin(rotationZ.current * PI_360))
+    );
   };
 
   const handleMouseUp = () => {
@@ -75,7 +81,11 @@ export const CubeInput: React.FC<{
       rotationZ.current
     );
 
-    onChange(rotationX.current, rotationY.current, rotationZ.current);
+    onChange(
+      Math.abs(Math.sin(rotationX.current * PI_360)),
+      Math.abs(Math.sin(rotationY.current * PI_360)),
+      Math.abs(Math.sin(rotationZ.current * PI_360))
+    );
   };
 
   return (

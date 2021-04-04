@@ -50,10 +50,7 @@ export class FmSynth {
 
   private preset: FmPreset;
 
-  public constructor(
-    context: AudioContext,
-    output: AudioDestinationNode | GainNode
-  ) {
+  public constructor(context: AudioContext, output: GainNode) {
     // Create audio context
     this.context = context;
 
@@ -102,9 +99,6 @@ export class FmSynth {
   public changeInstrument(preset: FmPreset): void {
     // Set preset
     this.preset = preset;
-
-    // Gain
-    this.gain.gain.value = preset.gain;
 
     // Wave
     if (preset.op1.type === "custom" && preset.op1.custom) {
@@ -253,11 +247,8 @@ export class FmSynth {
     }
   }
 
-  public createAnalyser(): AnalyserNode {
-    const analyser = this.context.createAnalyser();
-    analyser.fftSize = 256;
-    this.gain.connect(analyser);
-    return analyser;
+  public setVol(vol: number): void {
+    this.gain.gain.value = vol;
   }
 }
 

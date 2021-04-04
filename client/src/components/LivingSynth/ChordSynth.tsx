@@ -5,7 +5,7 @@ interface Operator {
   panner: StereoPannerNode;
 }
 
-const NUM_OSCS = 10;
+const NUM_OSCS = 8;
 
 export class ChordSynth {
   private readonly context: AudioContext;
@@ -14,10 +14,7 @@ export class ChordSynth {
 
   private readonly operators: Operator[];
 
-  public constructor(
-    context: AudioContext,
-    output: AudioDestinationNode | GainNode
-  ) {
+  public constructor(context: AudioContext, output: GainNode) {
     // Create audio context
     this.context = context;
 
@@ -42,7 +39,7 @@ export class ChordSynth {
       op.lfo.connect(op.panner.pan);
       op.oscGain.connect(op.panner);
       op.panner.connect(this.gain);
-      op.oscGain.gain.value = 1.0;
+      op.oscGain.gain.value = 0.0;
       op.lfo.frequency.value = i + 1;
       this.operators.push(op);
     }
@@ -56,12 +53,9 @@ export class ChordSynth {
         op.oscGain.gain.value = 1.0;
         op.osc.frequency.cancelScheduledValues(0);
         op.osc.frequency.setValueAtTime(op.osc.frequency.value, now);
-        op.osc.frequency.linearRampToValueAtTime(
-          notes[i][0],
-          now + duration / 5000
-        );
+        op.osc.frequency.linearRampToValueAtTime(notes[i][0], now + duration);
       } else {
-        op.oscGain.gain.value = 0;
+        //op.oscGain.gain.value = 0;
       }
     });
   }

@@ -8,6 +8,10 @@ import {
   Select,
   Typography,
   CardActions,
+  Slider,
+  Checkbox,
+  FormControlLabel,
+  Grid,
 } from "@material-ui/core";
 
 import { Controller } from "../components/LivingSynth/Controller";
@@ -16,12 +20,35 @@ import { SCALES } from "../components/LivingSynth/scales";
 import { useAudioContext } from "../hooks/useAudioContext";
 import { GameOfLife } from "../components/GameOfLife";
 import { CubeInput } from "../components/CubeInput";
+import { DotDraw } from "../components/DotDraw";
+import { SetInterval } from "../helpers/SetInterval";
 
 export const GuidedMusic: React.FC<RouteComponentProps> = () => {
-  const context = useAudioContext();
+  const { context, analyser, gain } = useAudioContext();
 
   const [fmSynth, setFmSynth] = React.useState<Controller | null>(null);
-  const [paused, setPaused] = React.useState(true);
+  const [speed, setSpeed] = React.useState(100);
+  const [points, setPoints] = React.useState(() => ({
+    real: new Float32Array(20),
+    imag: new Float32Array(20),
+  }));
+  const [shouldSimSynth, setShouldSimSynth] = React.useState(false);
+  const [stepBackSynth, setStepBackSynth] = React.useState(false);
+  const [shouldSimDrum, setShouldSimDrum] = React.useState(false);
+  const [stepBackDrum, setStepBackDrum] = React.useState(false);
+  const [step, setStep] = React.useState(0);
+
+  React.useEffect(() => {
+    const int = new SetInterval((elapsed) => {
+      setStep(Math.floor((elapsed / speed) % 8));
+    });
+
+    int.start();
+
+    return () => {
+      int.stop();
+    };
+  }, [speed]);
 
   const startSynth = () => {
     if (context.state === "suspended") {
@@ -29,13 +56,11 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
     }
 
     if (!fmSynth) {
-      setFmSynth(new Controller(context));
+      setFmSynth(new Controller(context, gain));
     }
-
-    setPaused(!paused);
   };
 
-  const handleCubeState = (x: number, y: number, z: number) => {
+  const handleCube1State = (x: number, y: number, z: number) => {
     if (!fmSynth) {
       return;
     }
@@ -43,50 +68,289 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
     fmSynth.paramChange(x, y, z);
   };
 
-  return (
-    <Card>
-      <Button onClick={startSynth}>{paused ? "Start" : "Stop"}</Button>
-      <Oscilloscope createAnalyser={fmSynth?.createAnalyser.bind(fmSynth)} />
-      <CardContent>
-        <Typography variant="h5">Configure</Typography>
-      </CardContent>
-      <CardActions>
-        <Select
-          variant="outlined"
-          style={{ marginBottom: 16 }}
-          onChange={(event) => {
-            if (typeof event.target.value === "string" && fmSynth) {
-              fmSynth.setScale(SCALES[event.target.value]);
-            }
-          }}
-          defaultValue="chromatic"
-          fullWidth
-          placeholder="Select a scale"
-          color="primary"
-        >
-          <MenuItem value={-1} disabled>
-            Select a preset
-          </MenuItem>
-          {Object.keys(SCALES).map((key, index) => (
-            <MenuItem value={key} key={key}>
-              {key}
-            </MenuItem>
-          ))}
-        </Select>
-      </CardActions>
-      <GameOfLife
-        width={12}
-        height={12}
-        cellSize={50}
-        paused={paused}
-        onChange={(arr) => {
-          if (fmSynth) {
-            fmSynth.evolve(arr);
-          }
-        }}
-      />
+  const handleCube2State = (x: number, y: number, z: number) => {
+    if (!fmSynth) {
+      return;
+    }
 
-      <CubeInput size={300} onChange={handleCubeState} />
-    </Card>
+    fmSynth.paramChange2(x, y, z);
+  };
+
+  return (
+    <Grid container spacing={2} alignItems="stretch">
+      <Grid item lg={6}>
+        <Card>
+          <Button onClick={startSynth}>{fmSynth ? "Start" : "Stop"}</Button>
+
+          <CardContent>
+            <Typography variant="h5">Speed</Typography>
+          </CardContent>
+          <Slider
+            value={speed}
+            onChange={(_event, value) => {
+              if (typeof value === "number") {
+                setSpeed(value);
+              }
+            }}
+            max={1000}
+            min={0}
+            step={1}
+          />
+
+          <CardContent>
+            <Typography variant="h5">Poly Vol</Typography>
+          </CardContent>
+          <Slider
+            defaultValue={0.1}
+            onChange={(_event, value) => {
+              if (typeof value === "number") {
+                fmSynth?.setPolyVol(value);
+              }
+            }}
+            max={1}
+            min={0}
+            step={0.01}
+          />
+
+          <CardContent>
+            <Typography variant="h5">Mono Vol</Typography>
+          </CardContent>
+          <Slider
+            defaultValue={0.1}
+            onChange={(_event, value) => {
+              if (typeof value === "number") {
+                fmSynth?.setMonoVol(value);
+              }
+            }}
+            max={1}
+            min={0}
+            step={0.01}
+          />
+
+          <CardContent>
+            <Typography variant="h5">Drum Vol</Typography>
+          </CardContent>
+          <Slider
+            defaultValue={0.1}
+            onChange={(_event, value) => {
+              if (typeof value === "number") {
+                fmSynth?.setDrumVol(value);
+              }
+            }}
+            max={1}
+            min={0}
+            step={0.01}
+          />
+
+          <CardContent>
+            <Typography variant="h5">Drum Dist</Typography>
+          </CardContent>
+          <Slider
+            defaultValue={0.0}
+            onChange={(_event, value) => {
+              if (typeof value === "number") {
+                fmSynth?.setDrumDist(value);
+              }
+            }}
+            max={1}
+            min={0}
+            step={0.01}
+          />
+
+          <CardContent>
+            <Typography variant="h5">Poly Dist</Typography>
+          </CardContent>
+          <Slider
+            defaultValue={0.0}
+            onChange={(_event, value) => {
+              if (typeof value === "number") {
+                fmSynth?.setPolyDist(value);
+              }
+            }}
+            max={1}
+            min={0}
+            step={0.01}
+          />
+        </Card>
+      </Grid>
+
+      <Grid item lg={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="h5">Visualizer</Typography>
+          </CardContent>
+          <Oscilloscope analyser={analyser} />
+          <CardContent>
+            <Typography variant="h5">Scale</Typography>
+          </CardContent>
+          <CardActions>
+            <Select
+              variant="outlined"
+              style={{ marginBottom: 16 }}
+              onChange={(event) => {
+                if (typeof event.target.value === "string" && fmSynth) {
+                  fmSynth.setScale(SCALES[event.target.value]);
+                }
+              }}
+              defaultValue="chromatic"
+              fullWidth
+              placeholder="Select a scale"
+              color="primary"
+            >
+              <MenuItem value={-1} disabled>
+                Select a preset
+              </MenuItem>
+              {Object.keys(SCALES).map((key) => (
+                <MenuItem value={key} key={key}>
+                  {key}
+                </MenuItem>
+              ))}
+            </Select>
+          </CardActions>
+        </Card>
+      </Grid>
+
+      <Grid item lg={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="h5">Synth Sequencer</Typography>
+
+            <GameOfLife
+              speed={speed}
+              width={8}
+              height={8}
+              cellSize={30}
+              step={step}
+              onChange={(arr) => {
+                if (fmSynth) {
+                  fmSynth.evolve(arr);
+                }
+              }}
+              shouldSim={shouldSimSynth}
+              goBack={stepBackSynth}
+            />
+          </CardContent>
+          <CardActions>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={shouldSimSynth}
+                  onChange={(_event: unknown, value: boolean) =>
+                    setShouldSimSynth(value)
+                  }
+                />
+              }
+              label="Step Forward"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={stepBackSynth}
+                  onChange={(_event: unknown, value: boolean) =>
+                    setStepBackSynth(value)
+                  }
+                />
+              }
+              label="Step Back"
+            />
+          </CardActions>
+        </Card>
+      </Grid>
+      <Grid item lg={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="h5">Drum Sequencer</Typography>
+
+            <GameOfLife
+              speed={speed}
+              width={8}
+              height={8}
+              cellSize={30}
+              step={step}
+              shouldSim={shouldSimDrum}
+              onChange={(arr) => {
+                if (fmSynth) {
+                  fmSynth.drums(arr);
+                }
+              }}
+              goBack={stepBackDrum}
+            />
+          </CardContent>
+          <CardActions>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={shouldSimDrum}
+                  onChange={(_event: unknown, value: boolean) =>
+                    setShouldSimDrum(value)
+                  }
+                />
+              }
+              label="Step Forward"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={stepBackDrum}
+                  onChange={(_event: unknown, value: boolean) =>
+                    setStepBackDrum(value)
+                  }
+                />
+              }
+              label="Step Back"
+            />
+          </CardActions>
+        </Card>
+      </Grid>
+
+      <Grid item lg={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="h5">Poly Synth Real</Typography>
+          </CardContent>
+          <DotDraw
+            height={200}
+            samples={points.imag.length}
+            points={points.imag}
+            onChange={(imag) => {
+              setPoints({ ...points, imag });
+              fmSynth?.setPoints({ ...points, imag });
+            }}
+          />
+        </Card>
+      </Grid>
+      <Grid item lg={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="h5">Poly Synth Imag</Typography>
+          </CardContent>
+          <DotDraw
+            height={200}
+            samples={points.real.length}
+            points={points.real}
+            onChange={(real) => {
+              setPoints({ ...points, real });
+              fmSynth?.setPoints({ ...points, real });
+            }}
+          />
+        </Card>
+      </Grid>
+      <Grid item lg={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="h5">Lead ADSR</Typography>
+          </CardContent>
+          <CubeInput size={150} onChange={handleCube1State} />
+        </Card>
+      </Grid>
+      <Grid item lg={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="h5">Lead Timbre</Typography>
+          </CardContent>
+          <CubeInput size={150} onChange={handleCube2State} />
+        </Card>
+      </Grid>
+    </Grid>
   );
 };

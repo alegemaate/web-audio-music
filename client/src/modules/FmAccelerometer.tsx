@@ -19,7 +19,7 @@ const MAX_FREQUENCY_1 = 1000;
 const MAX_FREQUENCY_2 = 20;
 
 export const FmAccelerometer: React.FC<RouteComponentProps> = () => {
-  const context = useAudioContext();
+  const { context, gain } = useAudioContext();
 
   const [mod1, setMod1] = React.useState<OscillatorNode | null>(null);
   const [mod2, setMod2] = React.useState<OscillatorNode | null>(null);
@@ -35,9 +35,6 @@ export const FmAccelerometer: React.FC<RouteComponentProps> = () => {
     if (context.state === "suspended") {
       context.resume();
     }
-
-    // Setup
-    const out = context.destination;
 
     // Instantiating
     const mod1 = context.createOscillator(); // Modulator 1
@@ -66,7 +63,7 @@ export const FmAccelerometer: React.FC<RouteComponentProps> = () => {
     mod1Gain.connect(carrier.frequency);
     mod2Gain.connect(mod1.frequency);
     carrier.connect(mainGain);
-    mainGain.connect(out);
+    mainGain.connect(gain);
 
     // Start making sound
     mod1.start();
