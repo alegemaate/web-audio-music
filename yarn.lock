@@ -11503,11 +11503,6 @@ wbuf@^1.1.0, wbuf@^1.7.3:
   dependencies:
     minimalistic-assert "^1.0.0"
 
-webaudio-oscilloscope@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/webaudio-oscilloscope/-/webaudio-oscilloscope-3.2.1.tgz#9c7dfda5f24bd4af9bc01109cc34e4d57a52c258"
-  integrity sha512-yacR1TI0j6Sg0JVCYtK067bWangPQTHkOmE8pfrDp8Znv83QgfRdIVnQGz2ciYZnR2LphFOE+iLRCjhzIObemA==
-
 webidl-conversions@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-5.0.0.tgz#ae59c8a00b121543a2acc65c0434f57b0fc11aff"
