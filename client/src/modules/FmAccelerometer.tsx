@@ -11,6 +11,7 @@ import { VolumeUp, Waves } from "@material-ui/icons";
 
 import { AccelPad, AccelParams } from "../components/AccelPad";
 import { rangeMap } from "../helpers/helpers";
+import { useAudioContext } from "../hooks/useAudioContext";
 
 const MAX_GAIN_1 = 10000;
 const MAX_GAIN_2 = 1000;
@@ -18,6 +19,8 @@ const MAX_FREQUENCY_1 = 1000;
 const MAX_FREQUENCY_2 = 20;
 
 export const FmAccelerometer: React.FC<RouteComponentProps> = () => {
+  const { context, gain } = useAudioContext();
+
   const [mod1, setMod1] = React.useState<OscillatorNode | null>(null);
   const [mod2, setMod2] = React.useState<OscillatorNode | null>(null);
   const [gain1, setGain1] = React.useState<GainNode | null>(null);
@@ -26,27 +29,12 @@ export const FmAccelerometer: React.FC<RouteComponentProps> = () => {
   const [freq2Val, setFreq2Val] = React.useState(440);
   const [gain1Val, setGain1Val] = React.useState(3000);
   const [gain2Val, setGain2Val] = React.useState(3000);
-  const [context, setContext] = React.useState<AudioContext | null>(null);
-
-  React.useEffect(() => {
-    if (!context) {
-      setContext(new AudioContext());
-    }
-    return () => {
-      context?.close();
-    };
-  }, [context]);
 
   const startSynth = () => {
-    if (!context) {
-      return;
-    }
-
     // Create audio context
-    context.resume();
-
-    // Setup
-    const out = context.destination;
+    if (context.state === "suspended") {
+      context.resume();
+    }
 
     // Instantiating
     const mod1 = context.createOscillator(); // Modulator 1
@@ -75,7 +63,7 @@ export const FmAccelerometer: React.FC<RouteComponentProps> = () => {
     mod1Gain.connect(carrier.frequency);
     mod2Gain.connect(mod1.frequency);
     carrier.connect(mainGain);
-    mainGain.connect(out);
+    mainGain.connect(gain);
 
     // Start making sound
     mod1.start();

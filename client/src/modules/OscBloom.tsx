@@ -101,7 +101,6 @@ export const OscBloom: React.FC<
     const { nativeEvent } = event;
     const x = nativeEvent.offsetX;
     const y = nativeEvent.offsetY;
-    console.log(x, y);
 
     if (boardRef.current) {
       boardRef.current.style.backgroundColor = `rgba(0, ${rangeMap(

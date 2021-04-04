@@ -48,18 +48,11 @@ export class FmSynth {
 
   private readonly op2Feedback: GainNode;
 
-  private readonly analyser: AnalyserNode;
-
   private preset: FmPreset;
 
-  public constructor() {
+  public constructor(context: AudioContext, output: GainNode) {
     // Create audio context
-    this.context = new AudioContext();
-    this.context.resume();
-
-    // Create analyser
-    this.analyser = this.context.createAnalyser();
-    this.analyser.fftSize = 256;
+    this.context = context;
 
     // Create oscs
     this.op1 = this.context.createOscillator();
@@ -75,14 +68,14 @@ export class FmSynth {
 
     // Create global gain
     this.gain = this.context.createGain();
+    this.gain.gain.value = 0.9;
 
     // Wiring
     this.op1.connect(this.op1Gain);
     this.op1.connect(this.op1Feedback);
     this.op2.connect(this.op2Gain);
     this.op2.connect(this.op2Feedback);
-    this.gain.connect(this.context.destination);
-    this.gain.connect(this.analyser);
+    this.gain.connect(output);
 
     // Start Synth
     this.op1.start();
@@ -106,9 +99,6 @@ export class FmSynth {
   public changeInstrument(preset: FmPreset): void {
     // Set preset
     this.preset = preset;
-
-    // Gain
-    this.gain.gain.value = preset.gain;
 
     // Wave
     if (preset.op1.type === "custom" && preset.op1.custom) {
@@ -257,8 +247,8 @@ export class FmSynth {
     }
   }
 
-  public getAnalyser(): AnalyserNode {
-    return this.analyser;
+  public setVol(vol: number): void {
+    this.gain.gain.value = vol;
   }
 }
 

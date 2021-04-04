@@ -10,51 +10,13 @@ import {
   Typography,
 } from "@material-ui/core";
 
-import { FmPreset, FmSynth } from "../components/FmSynth";
 import { Oscilloscope } from "../components/Oscilloscope";
 import { DotDraw } from "../components/DotDraw";
+import { useAudioContext } from "../hooks/useAudioContext";
+import { AdditiveSynth } from "../components/AdditiveSynth";
 
 const CANVAS_HEIGHT = 300;
 const DEFAULT_SAMPLES = 20;
-
-const DEFAULT_PRESET: FmPreset = {
-  name: "Basic",
-  gain: 0.2,
-  op1: {
-    dest: "out",
-    type: "sine",
-    ratio: 1.0,
-    feedback: 0.0,
-    level: 1.0,
-    adsr: {
-      attackLevel: 0.0,
-      attackTime: 0.0,
-      decayLevel: 0.0,
-      decayTime: 0.0,
-      sustainLevel: 1.0,
-      sustainTime: 0.0,
-      releaseLevel: 0.0,
-      releaseTime: 0.0,
-    },
-  },
-  op2: {
-    dest: "blackhole",
-    type: "sine",
-    ratio: 0.5,
-    feedback: 0.0,
-    level: 1.0,
-    adsr: {
-      attackLevel: 0.0,
-      attackTime: 0.0,
-      decayLevel: 0.0,
-      decayTime: 0.0,
-      sustainLevel: 0.0,
-      sustainTime: 0.0,
-      releaseLevel: 0.0,
-      releaseTime: 0.0,
-    },
-  },
-};
 
 const getFourierPreset = (
   type: "square" | "triangle" | "sawtooth" | "rectified" | "cosine",
@@ -103,35 +65,22 @@ const getFourierPreset = (
 };
 
 export const WaveformDraw: React.FC<RouteComponentProps> = () => {
-  const [points, setPoints] = React.useState({
+  const { context, analyser, gain } = useAudioContext();
+
+  const [points, setPoints] = React.useState(() => ({
     real: new Float32Array(DEFAULT_SAMPLES),
     imag: new Float32Array(DEFAULT_SAMPLES),
-  });
-  const [fmSynth, setFmSynth] = React.useState<FmSynth | null>(null);
+  }));
+  const [synth] = React.useState(() => new AdditiveSynth(context, gain));
   const [freq, setFreq] = React.useState(440);
 
   React.useEffect(() => {
-    // Update preset with points
-    const newPreset: FmPreset = {
-      ...DEFAULT_PRESET,
-      op1: {
-        ...DEFAULT_PRESET.op1,
-        type: "custom",
-        custom: points,
-      },
-    };
-
-    if (fmSynth) {
-      fmSynth.changeInstrument(newPreset);
-      fmSynth.play(freq);
-    }
-  }, [points, freq, fmSynth]);
+    synth.setPoints(points);
+    synth.play(freq);
+  }, [points, freq, synth]);
 
   const stopNote = () => {
-    if (!fmSynth) {
-      return;
-    }
-    fmSynth.stop();
+    synth.stop();
   };
 
   const reset = () => {
@@ -142,9 +91,10 @@ export const WaveformDraw: React.FC<RouteComponentProps> = () => {
   };
 
   const startSynth = () => {
-    if (!fmSynth) {
-      setFmSynth(new FmSynth());
+    if (context.state === "suspended") {
+      context.resume();
     }
+    synth.play(freq);
   };
 
   return (
@@ -167,7 +117,7 @@ export const WaveformDraw: React.FC<RouteComponentProps> = () => {
           setPoints({ ...points, imag });
         }}
       />
-      <Oscilloscope analyser={fmSynth?.getAnalyser()} />
+      <Oscilloscope analyser={analyser} />
       <CardActions>
         <Button
           onClick={startSynth}

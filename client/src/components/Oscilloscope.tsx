@@ -1,8 +1,8 @@
 import * as React from "react";
 
-export const Oscilloscope: React.FC<{ analyser?: AnalyserNode }> = ({
-  analyser,
-}) => {
+export const Oscilloscope: React.FC<{
+  analyser: AnalyserNode;
+}> = ({ analyser }) => {
   const oscRef = React.useRef<HTMLCanvasElement>(null);
   const parentRef = React.useRef<HTMLDivElement>(null);
   const [width, setWidth] = React.useState(0);
