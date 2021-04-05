@@ -24,7 +24,11 @@ export class AdditiveSynth {
 
   private vol: number;
 
-  public constructor(context: AudioContext, output: GainNode) {
+  public constructor(
+    context: AudioContext,
+    output: GainNode,
+    recorder?: MediaStreamAudioDestinationNode
+  ) {
     // Create audio context
     this.context = context;
 
@@ -34,6 +38,10 @@ export class AdditiveSynth {
     this.gain = this.context.createGain();
     this.gain.gain.value = 0.0;
     this.gain.connect(output);
+
+    if (recorder) {
+      this.gain.connect(recorder);
+    }
 
     // Create oscs
     this.op1 = this.context.createOscillator();
@@ -74,7 +82,7 @@ export class AdditiveSynth {
   }
 
   public stop(): void {
-    this.gain.gain.value = 0.0;
+    this.gain.disconnect();
   }
 
   public setVol(vol: number): void {

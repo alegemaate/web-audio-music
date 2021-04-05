@@ -47,6 +47,45 @@ const PRESET: FmPreset = {
   },
 };
 
+class AudioRecorder {
+  private readonly chunks: Blob[];
+
+  private readonly recorder: MediaRecorder;
+
+  private readonly dest: MediaStreamAudioDestinationNode;
+
+  public constructor(context: AudioContext) {
+    // Create recorder
+    this.chunks = [];
+    this.dest = context.createMediaStreamDestination();
+    this.recorder = new MediaRecorder(this.dest.stream);
+    this.recorder.start();
+
+    this.recorder.ondataavailable = (evt) => {
+      this.chunks.push(evt.data);
+    };
+
+    this.recorder.onstop = () => {
+      const blob = new Blob(this.chunks, { type: "audio/ogg; codecs=opus" });
+      const audioElement = document.createElement("audio");
+      audioElement.src = URL.createObjectURL(blob);
+      audioElement.controls = true;
+      const recordings = document.getElementById("recording-list");
+      if (recordings) {
+        recordings.appendChild(audioElement);
+      }
+    };
+  }
+
+  public getRecorder(): MediaStreamAudioDestinationNode {
+    return this.dest;
+  }
+
+  public stop(): void {
+    this.recorder.stop();
+  }
+}
+
 export class Controller {
   private readonly context: AudioContext;
 
@@ -64,6 +103,8 @@ export class Controller {
 
   private preset: FmPreset = PRESET;
 
+  private recorders: AudioRecorder[];
+
   public constructor(context: AudioContext, gain: GainNode) {
     // Create audio context
     this.context = context;
@@ -75,21 +116,56 @@ export class Controller {
     // Wiring
     this.gain.connect(gain);
 
-    // Create chord component
-    this.chords = [];
-    this.chords.push(new AdditiveSynth(this.context, this.gain));
-    this.chords.push(new AdditiveSynth(this.context, this.gain));
-    this.chords.push(new AdditiveSynth(this.context, this.gain));
-    this.chords.push(new AdditiveSynth(this.context, this.gain));
-    this.chords.push(new AdditiveSynth(this.context, this.gain));
-    this.chords.push(new AdditiveSynth(this.context, this.gain));
-    this.chords.push(new AdditiveSynth(this.context, this.gain));
-    this.chords.push(new AdditiveSynth(this.context, this.gain));
+    // Recorders
+    this.recorders = [];
 
-    this.drumMachine = new DrumMachine(context, gain);
+    // Create chord component
+    const chordRecorder = new AudioRecorder(this.context);
+    this.recorders.push(chordRecorder);
+
+    this.chords = [];
+    this.chords.push(
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+    );
+    this.chords.push(
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+    );
+    this.chords.push(
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+    );
+    this.chords.push(
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+    );
+    this.chords.push(
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+    );
+    this.chords.push(
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+    );
+    this.chords.push(
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+    );
+    this.chords.push(
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+    );
+
+    // Create drum machine
+    const drumRecorder = new AudioRecorder(this.context);
+    this.recorders.push(drumRecorder);
+    this.drumMachine = new DrumMachine(
+      context,
+      gain,
+      drumRecorder.getRecorder()
+    );
 
     // Create lead synth component
-    this.leadSynth = new FmSynth(this.context, this.gain);
+    const leadRecorder = new AudioRecorder(this.context);
+    this.recorders.push(leadRecorder);
+    this.leadSynth = new FmSynth(
+      this.context,
+      this.gain,
+      leadRecorder.getRecorder()
+    );
     this.leadSynth.changeInstrument(this.preset);
 
     // Setup scaleChain
@@ -208,6 +284,20 @@ export class Controller {
   public setPolyDist(vol: number): void {
     this.chords.forEach((op) => {
       op.setDist(vol);
+    });
+  }
+
+  public stop(): void {
+    this.chords.forEach((op) => {
+      op.stop();
+    });
+
+    this.drumMachine.stop();
+
+    this.leadSynth.destroy();
+
+    this.recorders.forEach((rec) => {
+      rec.stop();
     });
   }
 }

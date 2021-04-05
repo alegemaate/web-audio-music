@@ -50,7 +50,11 @@ export class FmSynth {
 
   private preset: FmPreset;
 
-  public constructor(context: AudioContext, output: GainNode) {
+  public constructor(
+    context: AudioContext,
+    output: GainNode,
+    recorder?: MediaStreamAudioDestinationNode
+  ) {
     // Create audio context
     this.context = context;
 
@@ -69,6 +73,10 @@ export class FmSynth {
     // Create global gain
     this.gain = this.context.createGain();
     this.gain.gain.value = 0.9;
+
+    if (recorder) {
+      this.gain.connect(recorder);
+    }
 
     // Wiring
     this.op1.connect(this.op1Gain);

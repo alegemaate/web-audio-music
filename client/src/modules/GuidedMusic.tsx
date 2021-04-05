@@ -51,12 +51,14 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
   }, [speed]);
 
   const startSynth = () => {
-    if (context.state === "suspended") {
-      context.resume();
-    }
-
     if (!fmSynth) {
+      if (context.state === "suspended") {
+        context.resume();
+      }
+
       setFmSynth(new Controller(context, gain));
+    } else {
+      fmSynth.stop();
     }
   };
 
@@ -80,7 +82,7 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
     <Grid container spacing={2} alignItems="stretch">
       <Grid item lg={6}>
         <Card>
-          <Button onClick={startSynth}>{fmSynth ? "Start" : "Stop"}</Button>
+          <Button onClick={startSynth}>{fmSynth ? "Stop" : "Start"}</Button>
 
           <CardContent>
             <Typography variant="h5">Speed</Typography>
@@ -349,6 +351,14 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
             <Typography variant="h5">Lead Timbre</Typography>
           </CardContent>
           <CubeInput size={150} onChange={handleCube2State} />
+        </Card>
+      </Grid>
+
+      <Grid item lg={6}>
+        <Card>
+          <CardContent id="recording-list">
+            <Typography variant="h5">Recordings</Typography>
+          </CardContent>
         </Card>
       </Grid>
     </Grid>

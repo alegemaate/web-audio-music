@@ -22,7 +22,11 @@ export class DrumMachine {
 
   private readonly distortion: WaveShaperNode;
 
-  public constructor(context: AudioContext, output: GainNode) {
+  public constructor(
+    context: AudioContext,
+    output: GainNode,
+    recorder?: MediaStreamAudioDestinationNode
+  ) {
     // Create audio context
     this.context = context;
 
@@ -30,6 +34,10 @@ export class DrumMachine {
     this.gain = this.context.createGain();
     this.gain.gain.value = 0.1;
     this.gain.connect(output);
+
+    if (recorder) {
+      this.gain.connect(recorder);
+    }
 
     // Create dist gain
     this.distGain = this.context.createGain();
@@ -76,7 +84,7 @@ export class DrumMachine {
   }
 
   public stop(): void {
-    this.gain.gain.value = 0.0;
+    this.gain.disconnect();
   }
 
   public setVol(vol: number): void {
