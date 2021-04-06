@@ -51,14 +51,12 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
   }, [speed]);
 
   const startSynth = () => {
-    if (!fmSynth) {
-      if (context.state === "suspended") {
-        context.resume();
-      }
+    if (context.state === "suspended") {
+      context.resume();
+    }
 
+    if (!fmSynth) {
       setFmSynth(new Controller(context, gain));
-    } else {
-      fmSynth.stop();
     }
   };
 
