@@ -1,6 +1,6 @@
-# Web to OSC controller
+# Music Playground
 
-This project uses websockets to connect from the web browser (websockets) to a middleware server (node.js) which transmits messages to Open Sound Control applications.
+This project contains many instruments and experiments built on top of the modern WebAudio API.
 
 ## Setup
 
@@ -8,10 +8,10 @@ Simply run `yarn`
 
 ## Running
 
-You will need to run both the client and server. In two separate terminals run:
-`yarn start:server`
+The server is outdated, you only need to run the client using:
+
 `yarn start:client`
 
-## Remote development, use ngrok
+## Demo
 
-`ngrok http localhost:8080`
+https://alegemaate.com/osc-controller/
