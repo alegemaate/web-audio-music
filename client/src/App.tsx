@@ -109,7 +109,7 @@ const App: React.FC = () => {
       />
       <Container maxWidth="md">
         <Box maxWidth="md" mt={4}>
-          <Router basepath="/osc-controller">
+          <Router basepath="/web-audio-music">
             <Dashboard path="/" />
             <OscBloom path="/osc-bloom" onTransmit={playNote} />
             <OscAccelerometer path="/osc-accelerometer" onTransmit={playNote} />

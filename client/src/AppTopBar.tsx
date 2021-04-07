@@ -68,7 +68,7 @@ export const AppTopBar: React.FC<{
           <MenuIcon />
         </IconButton>
         <Link
-          to="/osc-controller/"
+          to="/web-audio-music/"
           className={classes.title}
           style={{ textDecoration: "none", color: "white" }}
         >
