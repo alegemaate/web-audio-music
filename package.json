@@ -1,5 +1,5 @@
 {
-  "name": "osc-controller",
+  "name": "web-audio-music",
   "workspaces": [
     "client",
     "server"
