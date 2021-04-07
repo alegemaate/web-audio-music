@@ -1,4 +1,4 @@
-# Music Playground
+# Web Audio Music
 
 This project contains many instruments and experiments built on top of the modern WebAudio API.
 
@@ -14,4 +14,4 @@ The server is outdated, you only need to run the client using:
 
 ## Demo
 
-https://alegemaate.com/osc-controller/
+https://alegemaate.com/web-audio-music/
