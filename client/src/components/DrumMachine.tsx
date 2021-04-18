@@ -1,3 +1,12 @@
+import clap from "../audio/clap.wav";
+import metal from "../audio/metal.wav";
+import kick from "../audio/kick.wav";
+import hat from "../audio/hat.wav";
+import snap from "../audio/snap.wav";
+import shaker from "../audio/shaker.wav";
+import snare from "../audio/snare.wav";
+import tap from "../audio/tap.wav";
+
 const makeDistortionCurve = (amount: number): Float32Array => {
   const k = amount;
   const n_samples = 44100;
@@ -48,14 +57,14 @@ export class DrumMachine {
 
     // Create samples
     this.samples = [];
-    this.loadSample("audio/clap.wav");
-    this.loadSample("audio/metal.wav");
-    this.loadSample("audio/kick.wav");
-    this.loadSample("audio/hat.wav");
-    this.loadSample("audio/snap.wav");
-    this.loadSample("audio/shaker.wav");
-    this.loadSample("audio/snare.wav");
-    this.loadSample("audio/tap.wav");
+    this.loadSample(clap);
+    this.loadSample(metal);
+    this.loadSample(kick);
+    this.loadSample(hat);
+    this.loadSample(snap);
+    this.loadSample(shaker);
+    this.loadSample(snare);
+    this.loadSample(tap);
 
     if (recorder) {
       this.gain.connect(recorder);
