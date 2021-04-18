@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
+
       - name: Caching Gatsby
         id: gatsby-cache-build
         uses: actions/cache@v2
@@ -47,5 +47,5 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: client/build
+          FOLDER: client/public
           SINGLE_COMMIT: true
