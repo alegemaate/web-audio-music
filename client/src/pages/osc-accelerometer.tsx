@@ -1,7 +1,7 @@
 import React from "react";
 
-import { Layout, WsArgs } from "../../components/Layout";
-import { AccelPad, AccelParams } from "../../components/AccelPad";
+import { Layout, WsArgs } from "../components/Layout";
+import { AccelPad, AccelParams } from "../components/AccelPad";
 
 const OscAccelerometer: React.FC<{
   onTransmit: (args: WsArgs) => void;

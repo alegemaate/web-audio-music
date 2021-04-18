@@ -16,7 +16,7 @@ module.exports = {
         name: "Allan's Web Audio Playground",
         short_name: "Allan's Web Audio",
         start_url: "/",
-        theme_color: "#dbb700",
+        theme_color: "#3f51b5",
       },
       resolve: "gatsby-plugin-manifest",
     },

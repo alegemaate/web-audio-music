@@ -9,11 +9,11 @@ import {
   Typography,
 } from "@material-ui/core";
 
-import { Oscilloscope } from "../../components/Oscilloscope";
-import { DotDraw } from "../../components/DotDraw";
-import { useAudioContext } from "../../hooks/useAudioContext";
-import { AdditiveSynth } from "../../components/AdditiveSynth";
-import { Layout } from "../../components/Layout";
+import { Oscilloscope } from "../components/Oscilloscope";
+import { DotDraw } from "../components/DotDraw";
+import { useAudioContext } from "../hooks/useAudioContext";
+import { AdditiveSynth } from "../components/AdditiveSynth";
+import { Layout } from "../components/Layout";
 
 const CANVAS_HEIGHT = 300;
 const DEFAULT_SAMPLES = 20;
@@ -71,15 +71,25 @@ const WaveformDraw: React.FC = () => {
     real: new Float32Array(DEFAULT_SAMPLES),
     imag: new Float32Array(DEFAULT_SAMPLES),
   }));
-  const [synth] = React.useState(() => new AdditiveSynth(context, gain));
+  const [synth] = React.useState(() =>
+    context && gain ? new AdditiveSynth(context, gain) : null
+  );
   const [freq, setFreq] = React.useState(440);
 
   React.useEffect(() => {
+    if (!synth) {
+      return;
+    }
+
     synth.setPoints(points);
     synth.play(freq);
   }, [points, freq, synth]);
 
   const stopNote = () => {
+    if (!synth) {
+      return;
+    }
+
     synth.stop();
   };
 
@@ -91,6 +101,10 @@ const WaveformDraw: React.FC = () => {
   };
 
   const startSynth = () => {
+    if (!context || !synth) {
+      return;
+    }
+
     if (context.state === "suspended") {
       context.resume();
     }

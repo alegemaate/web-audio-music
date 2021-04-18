@@ -13,15 +13,15 @@ import {
   Grid,
 } from "@material-ui/core";
 
-import { Controller } from "../../components/LivingSynth/Controller";
-import { Oscilloscope } from "../../components/Oscilloscope";
-import { SCALES } from "../../components/LivingSynth/scales";
-import { useAudioContext } from "../../hooks/useAudioContext";
-import { GameOfLife } from "../../components/GameOfLife";
-import { CubeInput } from "../../components/CubeInput";
-import { DotDraw } from "../../components/DotDraw";
-import { SetInterval } from "../../helpers/SetInterval";
-import { Layout } from "../../components/Layout";
+import { Controller } from "../components/LivingSynth/Controller";
+import { Oscilloscope } from "../components/Oscilloscope";
+import { SCALES } from "../components/LivingSynth/scales";
+import { useAudioContext } from "../hooks/useAudioContext";
+import { GameOfLife } from "../components/GameOfLife";
+import { CubeInput } from "../components/CubeInput";
+import { DotDraw } from "../components/DotDraw";
+import { SetInterval } from "../helpers/SetInterval";
+import { Layout } from "../components/Layout";
 
 const GuidedMusic: React.FC = () => {
   const { context, analyser, gain } = useAudioContext();
@@ -51,6 +51,10 @@ const GuidedMusic: React.FC = () => {
   }, [speed]);
 
   const startSynth = () => {
+    if (!context || !gain) {
+      return;
+    }
+
     if (!fmSynth) {
       if (context.state === "suspended") {
         context.resume();

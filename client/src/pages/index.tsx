@@ -10,11 +10,11 @@ import {
   Typography,
 } from "@material-ui/core";
 
-import { MODULES } from "../../constants/modules";
-import { Layout } from "../../components/Layout";
+import { MODULES } from "../constants/modules";
+import { Layout } from "../components/Layout";
 
 const useStyles = makeStyles({
-  root: {
+  card: {
     maxWidth: 345,
   },
   media: {
@@ -31,12 +31,12 @@ const Dashboard: React.FC = () => {
         {MODULES.filter((mod) => mod.dashboard).map((mod) => (
           <Grid xs={6} item key={mod.name}>
             <Link to={mod.link} style={{ textDecoration: "none" }}>
-              <Card className={classes.root}>
+              <Card className={classes.card}>
                 <CardActionArea>
                   <CardMedia
                     className={classes.media}
                     image={mod.image}
-                    title="Bloom"
+                    title={mod.name}
                   />
                   <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">

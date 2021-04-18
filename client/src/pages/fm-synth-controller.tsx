@@ -14,22 +14,28 @@ import {
   TextField,
 } from "@material-ui/core";
 
-import { FmPreset, FmSynth, FM_INSTRUMENTS } from "../../components/FmSynth";
-import { rangeMap } from "../../helpers/helpers";
-import { Oscilloscope } from "../../components/Oscilloscope";
-import { useAudioContext } from "../../hooks/useAudioContext";
-import { Layout } from "../../components/Layout";
+import { FmPreset, FmSynth, FM_INSTRUMENTS } from "../components/FmSynth";
+import { rangeMap } from "../helpers/helpers";
+import { Oscilloscope } from "../components/Oscilloscope";
+import { useAudioContext } from "../hooks/useAudioContext";
+import { Layout } from "../components/Layout";
 
 const FmSynthController: React.FC = () => {
   const { context, analyser, gain } = useAudioContext();
 
-  const [fmSynth] = React.useState<FmSynth>(() => new FmSynth(context, gain));
+  const [fmSynth] = React.useState(() =>
+    context && gain ? new FmSynth(context, gain) : null
+  );
   const [preset, setPreset] = React.useState<FmPreset>(FM_INSTRUMENTS[0]);
   const [copied, setCopied] = React.useState(false);
   const [presetText, setPresetText] = React.useState("");
   const [presetError, setPresetError] = React.useState("");
 
   const playNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (!context || !fmSynth) {
+      return;
+    }
+
     if (context.state === "suspended") {
       context.resume();
     }
@@ -46,6 +52,10 @@ const FmSynthController: React.FC = () => {
   };
 
   const stopNote = () => {
+    if (!fmSynth) {
+      return;
+    }
+
     fmSynth.stop();
   };
 

@@ -10,10 +10,10 @@ import {
   CardActions,
 } from "@material-ui/core";
 
-import { FmPreset, FmSynth } from "../../components/FmSynth";
-import { rangeMap } from "../../helpers/helpers";
-import { useAudioContext } from "../../hooks/useAudioContext";
-import { Layout } from "../../components/Layout";
+import { FmPreset, FmSynth } from "../components/FmSynth";
+import { rangeMap } from "../helpers/helpers";
+import { useAudioContext } from "../hooks/useAudioContext";
+import { Layout } from "../components/Layout";
 
 const DEFAULT_PRESET: FmPreset = {
   gain: 1.0,
@@ -56,10 +56,16 @@ const DEFAULT_PRESET: FmPreset = {
 const Harmonicity: React.FC = () => {
   const { context, gain } = useAudioContext();
 
-  const [fmSynth] = React.useState<FmSynth>(new FmSynth(context, gain));
+  const [fmSynth] = React.useState(
+    context && gain ? new FmSynth(context, gain) : null
+  );
   const [preset, setPreset] = React.useState<FmPreset>(DEFAULT_PRESET);
 
   const playNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (!context || !fmSynth) {
+      return;
+    }
+
     if (context.state === "suspended") {
       context.resume();
     }

@@ -8,8 +8,8 @@ import {
 import { Timelapse, Timer } from "@material-ui/icons";
 import React from "react";
 
-import { Layout, WsArgs } from "../../components/Layout";
-import { rangeMap } from "../../helpers/helpers";
+import { Layout, WsArgs } from "../components/Layout";
+import { rangeMap } from "../helpers/helpers";
 
 export type ClickHistory = {
   x: number;
