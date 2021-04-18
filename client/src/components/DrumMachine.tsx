@@ -35,10 +35,6 @@ export class DrumMachine {
     this.gain.gain.value = 0.1;
     this.gain.connect(output);
 
-    if (recorder) {
-      this.gain.connect(recorder);
-    }
-
     // Create dist gain
     this.distGain = this.context.createGain();
     this.distGain.gain.value = 0.0;
@@ -46,7 +42,7 @@ export class DrumMachine {
 
     // Create dist
     this.distortion = this.context.createWaveShaper();
-    this.distortion.curve = makeDistortionCurve(50);
+    this.distortion.curve = makeDistortionCurve(2000);
     this.distortion.oversample = "4x";
     this.distortion.connect(this.distGain);
 
@@ -60,6 +56,10 @@ export class DrumMachine {
     this.loadSample("audio/shaker.wav");
     this.loadSample("audio/snare.wav");
     this.loadSample("audio/tap.wav");
+
+    if (recorder) {
+      this.gain.connect(recorder);
+    }
   }
 
   public loadSample(name: string): void {
@@ -77,7 +77,7 @@ export class DrumMachine {
   public play(data: number[]): void {
     this.samples.forEach((sample, i) => {
       if (data[i]) {
-        sample.mediaElement.fastSeek(0);
+        sample.mediaElement.currentTime = 0;
         sample.mediaElement.play();
       }
     });

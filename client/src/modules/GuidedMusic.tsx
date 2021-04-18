@@ -51,12 +51,15 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
   }, [speed]);
 
   const startSynth = () => {
-    if (context.state === "suspended") {
-      context.resume();
-    }
-
     if (!fmSynth) {
+      if (context.state === "suspended") {
+        context.resume();
+      }
+
       setFmSynth(new Controller(context, gain));
+    } else {
+      console.log("stopping");
+      fmSynth.stop();
     }
   };
 
@@ -78,7 +81,7 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
 
   return (
     <Grid container spacing={2} alignItems="stretch">
-      <Grid item lg={6}>
+      <Grid item lg={6} md={6} sm={6}>
         <Card>
           <Button onClick={startSynth}>{fmSynth ? "Stop" : "Start"}</Button>
 
@@ -174,7 +177,7 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
         </Card>
       </Grid>
 
-      <Grid item lg={6}>
+      <Grid item lg={6} md={6} sm={6}>
         <Card>
           <CardContent>
             <Typography variant="h5">Visualizer</Typography>
@@ -210,11 +213,11 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
         </Card>
       </Grid>
 
-      <Grid item lg={6}>
+      <Grid item lg={6} md={6} sm={6}>
         <Card>
           <CardContent>
             <Typography variant="h5">Synth Sequencer</Typography>
-
+            <Typography variant="body2">Click to add point</Typography>
             <GameOfLife
               speed={speed}
               width={8}
@@ -256,11 +259,11 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
           </CardActions>
         </Card>
       </Grid>
-      <Grid item lg={6}>
+      <Grid item lg={6} md={6} sm={6}>
         <Card>
           <CardContent>
             <Typography variant="h5">Drum Sequencer</Typography>
-
+            <Typography variant="body2">Click to add point</Typography>
             <GameOfLife
               speed={speed}
               width={8}
@@ -303,10 +306,11 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
         </Card>
       </Grid>
 
-      <Grid item lg={6}>
+      <Grid item lg={6} md={12} sm={12}>
         <Card>
           <CardContent>
             <Typography variant="h5">Poly Synth Real</Typography>
+            <Typography variant="body2">Click and drag to change!</Typography>
           </CardContent>
           <DotDraw
             height={200}
@@ -319,10 +323,11 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
           />
         </Card>
       </Grid>
-      <Grid item lg={6}>
+      <Grid item lg={6} md={12} sm={12}>
         <Card>
           <CardContent>
-            <Typography variant="h5">Poly Synth Imag</Typography>
+            <Typography variant="h5">Poly Synth Imaginary</Typography>
+            <Typography variant="body2">Click and drag to change!</Typography>
           </CardContent>
           <DotDraw
             height={200}
@@ -335,27 +340,32 @@ export const GuidedMusic: React.FC<RouteComponentProps> = () => {
           />
         </Card>
       </Grid>
-      <Grid item lg={6}>
+      <Grid item lg={6} md={6} sm={6}>
         <Card>
           <CardContent>
             <Typography variant="h5">Lead ADSR</Typography>
+            <Typography variant="body2">Double click to reset</Typography>
           </CardContent>
           <CubeInput size={150} onChange={handleCube1State} />
         </Card>
       </Grid>
-      <Grid item lg={6}>
+      <Grid item lg={6} md={6} sm={6}>
         <Card>
           <CardContent>
             <Typography variant="h5">Lead Timbre</Typography>
+            <Typography variant="body2">Double click to reset</Typography>
           </CardContent>
           <CubeInput size={150} onChange={handleCube2State} />
         </Card>
       </Grid>
 
-      <Grid item lg={6}>
+      <Grid item lg={6} md={12} sm={12}>
         <Card>
           <CardContent id="recording-list">
             <Typography variant="h5">Recordings</Typography>
+            <Typography variant="body2">
+              Recordings will appear here after you click stop.
+            </Typography>
           </CardContent>
         </Card>
       </Grid>

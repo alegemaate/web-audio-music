@@ -88,6 +88,29 @@ export const CubeInput: React.FC<{
     );
   };
 
+  const reset = () => {
+    if (!boardRef.current) {
+      return;
+    }
+
+    rotationX.current = 0;
+    rotationY.current = 0;
+    rotationZ.current = 0;
+
+    // Set transform
+    boardRef.current.style.transform = getTransform(
+      rotationX.current,
+      rotationY.current,
+      rotationZ.current
+    );
+
+    onChange(
+      Math.abs(Math.sin(rotationX.current * PI_360)),
+      Math.abs(Math.sin(rotationY.current * PI_360)),
+      Math.abs(Math.sin(rotationZ.current * PI_360))
+    );
+  };
+
   return (
     <div
       style={{
@@ -113,6 +136,7 @@ export const CubeInput: React.FC<{
         onMouseLeave={handleMouseUp}
         onMouseMove={(event) => mouseMove(event, dragging)}
         onWheel={handleScroll}
+        onDoubleClick={reset}
       >
         <div
           style={{
