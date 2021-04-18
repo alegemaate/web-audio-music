@@ -6,10 +6,9 @@ import {
   Typography,
 } from "@material-ui/core";
 import { Timelapse, Timer } from "@material-ui/icons";
-import { RouteComponentProps } from "@reach/router";
 import React from "react";
 
-import { WsArgs } from "../App";
+import { Layout, WsArgs } from "../components/Layout";
 import { rangeMap } from "../helpers/helpers";
 
 export type ClickHistory = {
@@ -47,9 +46,9 @@ const ClickDot: React.FC<{
   );
 };
 
-export const OscBloom: React.FC<
-  RouteComponentProps & { onTransmit: (args: WsArgs) => void }
-> = ({ onTransmit }) => {
+const OscBloom: React.FC<{ onTransmit: (args: WsArgs) => void }> = ({
+  onTransmit,
+}) => {
   const [clickHistory, setClickHistory] = React.useState<ClickHistory[]>([]);
   const [timer, setTimer] = React.useState(0);
   const [size, setSize] = React.useState({ width: 0, height: 0 });
@@ -142,54 +141,58 @@ export const OscBloom: React.FC<
   };
 
   return (
-    <Card>
-      <div
-        ref={boardRef}
-        style={{
-          width: "100%",
-          height: 400,
-          position: "relative",
-          overflow: "hidden",
-          transition: "background-color 0.5s",
-        }}
-      >
-        {clickHistory.map((click) => (
-          <ClickDot
-            key={click.index}
-            click={click}
-            timer={timer}
-            boardWidth={size.width}
-            maxTime={maxTime}
-          />
-        ))}
+    <Layout>
+      <Card>
         <div
+          ref={boardRef}
           style={{
-            position: "absolute",
-            backgroundColor: "rgba(0,0,0,0)",
-            top: 0,
-            left: 0,
             width: "100%",
-            height: "100%",
+            height: 400,
+            position: "relative",
+            overflow: "hidden",
+            transition: "background-color 0.5s",
           }}
-          onMouseMove={mouseMoved}
-          onClick={mouseClicked}
-        />
-      </div>
-      <CardActions>
-        <Timer />
-        <Typography variant="body1" style={{ width: "100%" }}>
-          {Math.round(timer * 100) / 100}/{Math.round(maxTime * 100) / 100}
-        </Typography>
-        <Timelapse />
-        <Slider
-          value={maxTime}
-          onChange={handleMaxTimeChange}
-          max={20}
-          min={1}
-          step={0.1}
-        />
-        <Button onClick={clearHistory}>Clear</Button>
-      </CardActions>
-    </Card>
+        >
+          {clickHistory.map((click) => (
+            <ClickDot
+              key={click.index}
+              click={click}
+              timer={timer}
+              boardWidth={size.width}
+              maxTime={maxTime}
+            />
+          ))}
+          <div
+            style={{
+              position: "absolute",
+              backgroundColor: "rgba(0,0,0,0)",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+            }}
+            onMouseMove={mouseMoved}
+            onClick={mouseClicked}
+          />
+        </div>
+        <CardActions>
+          <Timer />
+          <Typography variant="body1" style={{ width: "100%" }}>
+            {Math.round(timer * 100) / 100}/{Math.round(maxTime * 100) / 100}
+          </Typography>
+          <Timelapse />
+          <Slider
+            value={maxTime}
+            onChange={handleMaxTimeChange}
+            max={20}
+            min={1}
+            step={0.1}
+          />
+          <Button onClick={clearHistory}>Clear</Button>
+        </CardActions>
+      </Card>
+    </Layout>
   );
 };
+
+export default OscBloom;

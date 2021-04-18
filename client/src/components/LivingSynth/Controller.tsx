@@ -1,4 +1,3 @@
-import { MarkovChain } from "./markovChain";
 import { SCALES } from "./scales";
 import { FmPreset, FmSynth } from "../FmSynth";
 import { AdditiveSynth } from "../AdditiveSynth";
@@ -54,24 +53,43 @@ class AudioRecorder {
 
   private readonly dest: MediaStreamAudioDestinationNode;
 
-  public constructor(context: AudioContext) {
+  private readonly name: string;
+
+  public constructor(context: AudioContext, name: string) {
+    console.log("Recorder create!");
+
+    // Name
+    this.name = name;
+
     // Create recorder
     this.chunks = [];
     this.dest = context.createMediaStreamDestination();
     this.recorder = new MediaRecorder(this.dest.stream);
-    this.recorder.start();
+    this.recorder.start(1000);
 
     this.recorder.ondataavailable = (evt) => {
       this.chunks.push(evt.data);
+      console.log(
+        `${this.name}: Recorder data avail! Data size: ${evt.data.size}. Chunks so far: ${this.chunks.length}. Recorder state: ${this.recorder.state}`
+      );
     };
 
     this.recorder.onstop = () => {
+      console.log(
+        `${this.name}: Recorder stopped. Chunks recorded: ${this.chunks.length}`
+      );
       const blob = new Blob(this.chunks, { type: "audio/ogg; codecs=opus" });
       const audioElement = document.createElement("audio");
       audioElement.src = URL.createObjectURL(blob);
       audioElement.controls = true;
+      audioElement.title = this.name;
+
+      const label = document.createElement("p");
+      label.innerHTML = this.name;
+
       const recordings = document.getElementById("recording-list");
       if (recordings) {
+        recordings.appendChild(label);
         recordings.appendChild(audioElement);
       }
     };
@@ -90,8 +108,6 @@ export class Controller {
   private readonly context: AudioContext;
 
   private readonly gain: GainNode;
-
-  private scaleChain: MarkovChain;
 
   private chords: AdditiveSynth[];
 
@@ -120,7 +136,7 @@ export class Controller {
     this.recorders = [];
 
     // Create chord component
-    const chordRecorder = new AudioRecorder(this.context);
+    const chordRecorder = new AudioRecorder(this.context, "Poly synth");
     this.recorders.push(chordRecorder);
 
     this.chords = [];
@@ -150,7 +166,7 @@ export class Controller {
     );
 
     // Create drum machine
-    const drumRecorder = new AudioRecorder(this.context);
+    const drumRecorder = new AudioRecorder(this.context, "Drums");
     this.recorders.push(drumRecorder);
     this.drumMachine = new DrumMachine(
       context,
@@ -159,7 +175,7 @@ export class Controller {
     );
 
     // Create lead synth component
-    const leadRecorder = new AudioRecorder(this.context);
+    const leadRecorder = new AudioRecorder(this.context, "Lead synth");
     this.recorders.push(leadRecorder);
     this.leadSynth = new FmSynth(
       this.context,
@@ -168,43 +184,8 @@ export class Controller {
     );
     this.leadSynth.changeInstrument(this.preset);
 
-    // Setup scaleChain
-    this.scaleChain = new MarkovChain(
-      [
-        {
-          current: "acoustic",
-          next: "aeolian",
-        },
-        {
-          current: "aeolian",
-          next: "algerian",
-        },
-        {
-          current: "algerian",
-          next: "augmented",
-        },
-        {
-          current: "blues",
-          next: "chromatic",
-        },
-        {
-          current: "algerian",
-          next: "blues",
-        },
-        {
-          current: "chromatic",
-          next: "yo",
-        },
-        {
-          current: "yo",
-          next: "acoustic",
-        },
-      ],
-      "acoustic"
-    );
-
     // Initial scale
-    this.scale = SCALES[this.scaleChain.next()];
+    this.scale = SCALES["acoustic"];
   }
 
   public evolve(data: number[]): void {
@@ -217,7 +198,13 @@ export class Controller {
         return [];
       }
 
-      return [mtof(this.scale[index % this.scale.length] + 48)];
+      return [
+        mtof(
+          this.scale[index % this.scale.length] +
+            48 +
+            12 * Math.floor(index / this.scale.length)
+        ),
+      ];
     });
 
     // Chords
@@ -236,9 +223,10 @@ export class Controller {
   }
 
   public paramChange(x: number, y: number, z: number): void {
-    this.preset.op1.adsr.attackTime = x;
-    this.preset.op1.adsr.decayTime = y;
-    this.preset.op1.adsr.releaseTime = z;
+    this.preset.op1.adsr.attackTime = x / 10.0;
+    this.preset.op1.adsr.decayTime = y / 10.0;
+    this.preset.op1.adsr.releaseTime = z / 10.0;
+
     this.leadSynth.changeInstrument(this.preset);
   }
 

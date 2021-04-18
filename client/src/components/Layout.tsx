@@ -1,19 +1,9 @@
 import React from "react";
-import { Router } from "@reach/router";
 import { Box, Container, makeStyles } from "@material-ui/core";
 
 import { ConnectForm } from "./ConnectForm";
-import { Dashboard } from "./Dashboard";
 import { AppDrawer } from "./AppDrawer";
 import { AppTopBar } from "./AppTopBar";
-
-import { OscBloom } from "./modules/OscBloom";
-import { OscAccelerometer } from "./modules/OscAccelerometer";
-import { FmAccelerometer } from "./modules/FmAccelerometer";
-import { FmSynthController } from "./modules/FmSynthController";
-import { Harmonicity } from "./modules/Harmonicity";
-import { WaveformDraw } from "./modules/WaveformDraw";
-import { GuidedMusic } from "./modules/GuidedMusic";
 
 export type WsArgs = {
   address: string;
@@ -26,7 +16,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const App: React.FC = () => {
+export const Layout: React.FC = ({ children }) => {
   const [client, setClient] = React.useState<WebSocket | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -109,20 +99,9 @@ const App: React.FC = () => {
       />
       <Container maxWidth="md">
         <Box maxWidth="md" mt={4}>
-          <Router basepath="/web-audio-music">
-            <Dashboard path="/" />
-            <OscBloom path="/osc-bloom" onTransmit={playNote} />
-            <OscAccelerometer path="/osc-accelerometer" onTransmit={playNote} />
-            <FmAccelerometer path="/fm-synth-accelerometer" />
-            <FmSynthController path="/fm-synth-controller" />
-            <Harmonicity path="/harmonicity" />
-            <WaveformDraw path="/waveform" />
-            <GuidedMusic path="/guided-music" />
-          </Router>
+          {children}
         </Box>
       </Container>
     </div>
   );
 };
-
-export default App;

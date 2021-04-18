@@ -18,3 +18,6 @@ client/build
 
 *.log
 .eslintcache
+
+.cache
+public

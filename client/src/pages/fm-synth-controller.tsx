@@ -1,6 +1,5 @@
 import React from "react";
 import * as yup from "yup";
-import { RouteComponentProps } from "@reach/router";
 import {
   Button,
   Card,
@@ -19,17 +18,24 @@ import { FmPreset, FmSynth, FM_INSTRUMENTS } from "../components/FmSynth";
 import { rangeMap } from "../helpers/helpers";
 import { Oscilloscope } from "../components/Oscilloscope";
 import { useAudioContext } from "../hooks/useAudioContext";
+import { Layout } from "../components/Layout";
 
-export const FmSynthController: React.FC<RouteComponentProps> = () => {
+const FmSynthController: React.FC = () => {
   const { context, analyser, gain } = useAudioContext();
 
-  const [fmSynth] = React.useState<FmSynth>(() => new FmSynth(context, gain));
+  const [fmSynth] = React.useState(() =>
+    context && gain ? new FmSynth(context, gain) : null
+  );
   const [preset, setPreset] = React.useState<FmPreset>(FM_INSTRUMENTS[0]);
   const [copied, setCopied] = React.useState(false);
   const [presetText, setPresetText] = React.useState("");
   const [presetError, setPresetError] = React.useState("");
 
   const playNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (!context || !fmSynth) {
+      return;
+    }
+
     if (context.state === "suspended") {
       context.resume();
     }
@@ -46,6 +52,10 @@ export const FmSynthController: React.FC<RouteComponentProps> = () => {
   };
 
   const stopNote = () => {
+    if (!fmSynth) {
+      return;
+    }
+
     fmSynth.stop();
   };
 
@@ -118,7 +128,7 @@ export const FmSynthController: React.FC<RouteComponentProps> = () => {
   };
 
   return (
-    <>
+    <Layout>
       <Grid container spacing={1}>
         <Grid xs={6} item>
           <OpPreset op="op1" preset={preset} setPreset={setPreset} />
@@ -241,7 +251,7 @@ export const FmSynthController: React.FC<RouteComponentProps> = () => {
           </Card>
         </Grid>
       </Grid>
-    </>
+    </Layout>
   );
 };
 
@@ -551,3 +561,5 @@ const OpPreset: React.FC<{
     </Card>
   );
 };
+
+export default FmSynthController;

@@ -54,7 +54,7 @@ export class AdditiveSynth {
 
     // Create dist
     this.distortion = this.context.createWaveShaper();
-    this.distortion.curve = makeDistortionCurve(50);
+    this.distortion.curve = makeDistortionCurve(2000);
     this.distortion.oversample = "4x";
     this.distortion.connect(this.distGain);
     this.op1.connect(this.distortion);

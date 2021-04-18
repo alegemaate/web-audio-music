@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "@reach/router";
+import { Link } from "gatsby";
 import {
   Drawer,
   ListItemText,
@@ -9,12 +9,7 @@ import {
   List,
 } from "@material-ui/core";
 
-import { MODULES } from "./modules";
-
-export type WsArgs = {
-  address: string;
-  args: (number | string)[];
-};
+import { MODULES } from "../constants/modules";
 
 const useStyles = makeStyles((theme) => ({
   list: {

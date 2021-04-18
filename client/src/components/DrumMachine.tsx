@@ -1,3 +1,12 @@
+import clap from "../audio/clap.wav";
+import metal from "../audio/metal.wav";
+import kick from "../audio/kick.wav";
+import hat from "../audio/hat.wav";
+import snap from "../audio/snap.wav";
+import shaker from "../audio/shaker.wav";
+import snare from "../audio/snare.wav";
+import tap from "../audio/tap.wav";
+
 const makeDistortionCurve = (amount: number): Float32Array => {
   const k = amount;
   const n_samples = 44100;
@@ -35,10 +44,6 @@ export class DrumMachine {
     this.gain.gain.value = 0.1;
     this.gain.connect(output);
 
-    if (recorder) {
-      this.gain.connect(recorder);
-    }
-
     // Create dist gain
     this.distGain = this.context.createGain();
     this.distGain.gain.value = 0.0;
@@ -46,20 +51,24 @@ export class DrumMachine {
 
     // Create dist
     this.distortion = this.context.createWaveShaper();
-    this.distortion.curve = makeDistortionCurve(50);
+    this.distortion.curve = makeDistortionCurve(2000);
     this.distortion.oversample = "4x";
     this.distortion.connect(this.distGain);
 
     // Create samples
     this.samples = [];
-    this.loadSample("audio/clap.wav");
-    this.loadSample("audio/metal.wav");
-    this.loadSample("audio/kick.wav");
-    this.loadSample("audio/hat.wav");
-    this.loadSample("audio/snap.wav");
-    this.loadSample("audio/shaker.wav");
-    this.loadSample("audio/snare.wav");
-    this.loadSample("audio/tap.wav");
+    this.loadSample(clap);
+    this.loadSample(metal);
+    this.loadSample(kick);
+    this.loadSample(hat);
+    this.loadSample(snap);
+    this.loadSample(shaker);
+    this.loadSample(snare);
+    this.loadSample(tap);
+
+    if (recorder) {
+      this.gain.connect(recorder);
+    }
   }
 
   public loadSample(name: string): void {
@@ -77,7 +86,7 @@ export class DrumMachine {
   public play(data: number[]): void {
     this.samples.forEach((sample, i) => {
       if (data[i]) {
-        sample.mediaElement.fastSeek(0);
+        sample.mediaElement.currentTime = 0;
         sample.mediaElement.play();
       }
     });

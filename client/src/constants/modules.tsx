@@ -18,14 +18,14 @@ type ModuleType = {
 export const MODULES: ModuleType[] = [
   {
     name: "Home",
-    link: "/web-audio-music",
+    link: "/",
     icon: <Home />,
     dashboard: false,
     description: "",
   },
   {
     name: "Bloom",
-    link: "/web-audio-music/osc-bloom",
+    link: "/osc-bloom",
     icon: <Equalizer />,
     image: ImgBloom,
     dashboard: true,
@@ -33,7 +33,7 @@ export const MODULES: ModuleType[] = [
   },
   {
     name: "Accelerometer Control",
-    link: "/web-audio-music/osc-accelerometer",
+    link: "/osc-accelerometer",
     icon: <Equalizer />,
     image: ImgLandscape,
     dashboard: true,
@@ -41,7 +41,7 @@ export const MODULES: ModuleType[] = [
   },
   {
     name: "FM Accelerometer",
-    link: "/web-audio-music/fm-synth-accelerometer",
+    link: "/fm-accelerometer",
     icon: <Equalizer />,
     image: ImgFmSynth,
     dashboard: true,
@@ -49,7 +49,7 @@ export const MODULES: ModuleType[] = [
   },
   {
     name: "2 Op FM Synth",
-    link: "/web-audio-music/fm-synth-controller",
+    link: "/fm-synth-controller",
     icon: <Equalizer />,
     image: ImgTwoOpFmSynth,
     dashboard: true,
@@ -57,7 +57,7 @@ export const MODULES: ModuleType[] = [
   },
   {
     name: "Harmonicity Ratio",
-    link: "/web-audio-music/harmonicity",
+    link: "/harmonicity",
     icon: <Equalizer />,
     image: ImgLandscape,
     dashboard: true,
@@ -65,7 +65,7 @@ export const MODULES: ModuleType[] = [
   },
   {
     name: "Waveform Draw",
-    link: "/web-audio-music/waveform",
+    link: "/waveform",
     icon: <Equalizer />,
     image: ImgLandscape,
     dashboard: true,
@@ -73,7 +73,7 @@ export const MODULES: ModuleType[] = [
   },
   {
     name: "Guided Music",
-    link: "/web-audio-music/guided-music",
+    link: "/guided-music",
     icon: <Equalizer />,
     image: ImgLandscape,
     dashboard: true,

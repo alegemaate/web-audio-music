@@ -1,5 +1,4 @@
 import React from "react";
-import { RouteComponentProps } from "@reach/router";
 import {
   Button,
   Card,
@@ -14,6 +13,7 @@ import {
 import { FmPreset, FmSynth } from "../components/FmSynth";
 import { rangeMap } from "../helpers/helpers";
 import { useAudioContext } from "../hooks/useAudioContext";
+import { Layout } from "../components/Layout";
 
 const DEFAULT_PRESET: FmPreset = {
   gain: 1.0,
@@ -53,13 +53,19 @@ const DEFAULT_PRESET: FmPreset = {
   },
 };
 
-export const Harmonicity: React.FC<RouteComponentProps> = () => {
+const Harmonicity: React.FC = () => {
   const { context, gain } = useAudioContext();
 
-  const [fmSynth] = React.useState<FmSynth>(new FmSynth(context, gain));
+  const [fmSynth] = React.useState(
+    context && gain ? new FmSynth(context, gain) : null
+  );
   const [preset, setPreset] = React.useState<FmPreset>(DEFAULT_PRESET);
 
   const playNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (!context || !fmSynth) {
+      return;
+    }
+
     if (context.state === "suspended") {
       context.resume();
     }
@@ -84,7 +90,7 @@ export const Harmonicity: React.FC<RouteComponentProps> = () => {
   };
 
   return (
-    <>
+    <Layout>
       <Grid container spacing={1}>
         <Grid xs={12} item>
           <Card>
@@ -187,6 +193,8 @@ export const Harmonicity: React.FC<RouteComponentProps> = () => {
           </Card>
         </Grid>
       </Grid>
-    </>
+    </Layout>
   );
 };
+
+export default Harmonicity;

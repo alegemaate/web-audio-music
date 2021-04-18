@@ -1,5 +1,4 @@
 import React from "react";
-import { RouteComponentProps } from "@reach/router";
 import {
   Button,
   Card,
@@ -12,13 +11,14 @@ import { VolumeUp, Waves } from "@material-ui/icons";
 import { AccelPad, AccelParams } from "../components/AccelPad";
 import { rangeMap } from "../helpers/helpers";
 import { useAudioContext } from "../hooks/useAudioContext";
+import { Layout } from "../components/Layout";
 
 const MAX_GAIN_1 = 10000;
 const MAX_GAIN_2 = 1000;
 const MAX_FREQUENCY_1 = 1000;
 const MAX_FREQUENCY_2 = 20;
 
-export const FmAccelerometer: React.FC<RouteComponentProps> = () => {
+const FmAccelerometer: React.FC = () => {
   const { context, gain } = useAudioContext();
 
   const [mod1, setMod1] = React.useState<OscillatorNode | null>(null);
@@ -31,6 +31,10 @@ export const FmAccelerometer: React.FC<RouteComponentProps> = () => {
   const [gain2Val, setGain2Val] = React.useState(3000);
 
   const startSynth = () => {
+    if (!context || !gain) {
+      return;
+    }
+
     // Create audio context
     if (context.state === "suspended") {
       context.resume();
@@ -120,7 +124,7 @@ export const FmAccelerometer: React.FC<RouteComponentProps> = () => {
   };
 
   return (
-    <>
+    <Layout>
       <Card>
         <CardContent>
           {!mod1 && (
@@ -190,6 +194,8 @@ export const FmAccelerometer: React.FC<RouteComponentProps> = () => {
         </CardActions>
       </Card>
       {mod1 && <AccelPad onChange={handleAccel} />}
-    </>
+    </Layout>
   );
 };
+
+export default FmAccelerometer;
