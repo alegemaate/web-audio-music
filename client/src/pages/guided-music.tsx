@@ -88,7 +88,14 @@ const GuidedMusic: React.FC = () => {
       <Grid container spacing={2} alignItems="stretch">
         <Grid item lg={6} md={6} sm={6}>
           <Card>
-            <Button onClick={startSynth}>{fmSynth ? "Stop" : "Start"}</Button>
+            <CardContent>
+              <Typography variant="h5">
+                Start Here (Automatically Records)
+              </Typography>
+              <Button variant="outlined" onClick={startSynth}>
+                {fmSynth ? "Stop" : "Start"}
+              </Button>
+            </CardContent>
 
             <CardContent>
               <Typography variant="h5">Speed</Typography>
@@ -106,7 +113,7 @@ const GuidedMusic: React.FC = () => {
             />
 
             <CardContent>
-              <Typography variant="h5">Poly Vol</Typography>
+              <Typography variant="h5">Poly Volume</Typography>
             </CardContent>
             <Slider
               defaultValue={0.1}
@@ -121,7 +128,7 @@ const GuidedMusic: React.FC = () => {
             />
 
             <CardContent>
-              <Typography variant="h5">Mono Vol</Typography>
+              <Typography variant="h5">Mono Volume</Typography>
             </CardContent>
             <Slider
               defaultValue={0.1}
@@ -136,7 +143,7 @@ const GuidedMusic: React.FC = () => {
             />
 
             <CardContent>
-              <Typography variant="h5">Drum Vol</Typography>
+              <Typography variant="h5">Drum Volume</Typography>
             </CardContent>
             <Slider
               defaultValue={0.1}
@@ -151,7 +158,7 @@ const GuidedMusic: React.FC = () => {
             />
 
             <CardContent>
-              <Typography variant="h5">Drum Dist</Typography>
+              <Typography variant="h5">Drum Distortion</Typography>
             </CardContent>
             <Slider
               defaultValue={0.0}
@@ -166,7 +173,7 @@ const GuidedMusic: React.FC = () => {
             />
 
             <CardContent>
-              <Typography variant="h5">Poly Dist</Typography>
+              <Typography variant="h5">Poly Distortion</Typography>
             </CardContent>
             <Slider
               defaultValue={0.0}
@@ -200,7 +207,7 @@ const GuidedMusic: React.FC = () => {
                     fmSynth.setScale(SCALES[event.target.value]);
                   }
                 }}
-                defaultValue="chromatic"
+                defaultValue="acoustic"
                 fullWidth
                 placeholder="Select a scale"
                 color="primary"
