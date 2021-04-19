@@ -1,7 +1,7 @@
 import * as React from "react";
 
 export const Oscilloscope: React.FC<{
-  analyser: AnalyserNode;
+  analyser: AnalyserNode | null;
 }> = ({ analyser }) => {
   const oscRef = React.useRef<HTMLCanvasElement>(null);
   const parentRef = React.useRef<HTMLDivElement>(null);
