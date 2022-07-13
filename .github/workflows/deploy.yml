@@ -13,6 +13,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          cache: yarn
+
       - name: Caching Gatsby
         id: gatsby-cache-build
         uses: actions/cache@v2
@@ -24,13 +29,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gatsby-build-
 
-      - name: Restore node modules from cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: ${{ runner.os }}-yarn-
-
       - name: Install Dependencies
         run: yarn --frozen-lockfile
 
@@ -39,13 +37,11 @@ jobs:
           cd client
           yarn build
         env:
-          GATSBY_EXPERIMENTAL_PAGE_BUILD_ON_DATA_CHANGES: true
           CI: true
 
       - name: Deploy to Pages
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: client/public
-          SINGLE_COMMIT: true
+          branch: gh-pages
+          folder: client/public
+          single-commit: true
