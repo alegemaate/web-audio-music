@@ -1,4 +1,4 @@
-import { FmPreset } from ".";
+import type { FmPreset } from ".";
 
 export const FM_INSTRUMENTS: FmPreset[] = [
   {

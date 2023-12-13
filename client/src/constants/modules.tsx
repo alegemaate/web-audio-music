@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import * as React from "react";
 import { Equalizer, Home } from "@material-ui/icons";
 
@@ -6,14 +7,14 @@ import ImgBloom from "../images/bloom.png";
 import ImgTwoOpFmSynth from "../images/gmsynth.png";
 import ImgFmSynth from "../images/fmsynth.png";
 
-type ModuleType = {
+interface ModuleType {
   name: string;
   link: string;
   icon: JSX.Element;
   dashboard: boolean;
   description: string;
   image?: string;
-};
+}
 
 export const MODULES: ModuleType[] = [
   {
@@ -49,7 +50,7 @@ export const MODULES: ModuleType[] = [
   },
   {
     name: "2 Op FM Synth",
-    link: "/fm-synth-controller",
+    link: "/fm-synth",
     icon: <Equalizer />,
     image: ImgTwoOpFmSynth,
     dashboard: true,

@@ -2,18 +2,19 @@ import React from "react";
 import {
   Button,
   Card,
+  CardActions,
   CardContent,
   Grid,
   MenuItem,
   Select,
   Typography,
-  CardActions,
 } from "@material-ui/core";
 
-import { FmPreset, FmSynth } from "../components/FmSynth";
+import { type FmPreset, FmSynth } from "../components/FmSynth";
+import { Layout } from "../components/Layout";
 import { rangeMap } from "../helpers/helpers";
 import { useAudioContext } from "../hooks/useAudioContext";
-import { Layout } from "../components/Layout";
+import { Seo } from "../components/Seo";
 
 const DEFAULT_PRESET: FmPreset = {
   gain: 1.0,
@@ -56,18 +57,18 @@ const DEFAULT_PRESET: FmPreset = {
 const Harmonicity: React.FC = () => {
   const { context, gain } = useAudioContext();
 
-  const [fmSynth] = React.useState(
-    context && gain ? new FmSynth(context, gain) : null
+  const [fmSynth, _setFmSynth] = React.useState(
+    context && gain ? new FmSynth(context, gain) : null,
   );
   const [preset, setPreset] = React.useState<FmPreset>(DEFAULT_PRESET);
 
-  const playNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const playNote = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (!context || !fmSynth) {
       return;
     }
 
     if (context.state === "suspended") {
-      context.resume();
+      context.resume().catch(console.error);
     }
     fmSynth.changeInstrument(preset);
     const bounding = event.currentTarget.getBoundingClientRect();
@@ -76,7 +77,7 @@ const Harmonicity: React.FC = () => {
       0,
       bounding.width,
       50,
-      2000
+      2000,
     );
     fmSynth.play(freq);
   };
@@ -91,6 +92,10 @@ const Harmonicity: React.FC = () => {
 
   return (
     <Layout>
+      <Typography variant="h1">Harmonicity Ratio Controller</Typography>
+      <Typography variant="body1" style={{ marginBottom: 16 }}>
+        Test the harmonicity of two oscillators by changing their ratio.
+      </Typography>
       <Grid container spacing={1}>
         <Grid xs={12} item>
           <Card>
@@ -198,3 +203,10 @@ const Harmonicity: React.FC = () => {
 };
 
 export default Harmonicity;
+
+export const Head = (): JSX.Element => (
+  <Seo
+    title="Harmonicity Ratio Controller"
+    description="Test the harmonicity of two oscillators by changing their ratio."
+  />
+);

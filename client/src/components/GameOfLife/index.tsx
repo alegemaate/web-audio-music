@@ -16,7 +16,7 @@ const simulate = (last: number[][]): number[][] => {
   const temp: number[][] = [];
 
   for (let i = 0; i < height; i += 1) {
-    temp.push(new Array(width).fill(0));
+    temp.push(new Array<number>(width).fill(0));
   }
 
   for (let i = 0; i < width; i++) {
@@ -80,20 +80,20 @@ export const GameOfLife: React.FC<{
     cellLastRef.current.length = 0;
 
     for (let i = 0; i < height; i += 1) {
-      cellRef.current.push(new Array(width).fill(0));
-      cellLastRef.current.push(new Array(width).fill(0));
+      cellRef.current.push(new Array<number>(width).fill(0));
+      cellLastRef.current.push(new Array<number>(width).fill(0));
     }
   }, [width, height]);
 
   React.useEffect(() => {
-    const render = () => {
+    const render = (): number => {
       if (!canvasRef.current) {
-        return;
+        return 0;
       }
 
       const ctx = canvasRef.current.getContext("2d");
       if (!ctx) {
-        return;
+        return 0;
       }
 
       ctx.clearRect(0, 0, width * cellSize, height * cellSize);
@@ -157,9 +157,7 @@ export const GameOfLife: React.FC<{
     }
   }, [onChange, width, speed, shouldSim, goBack, step]);
 
-  const handleClick = (
-    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
-  ) => {
+  const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!canvasRef.current) {
       return;
     }
@@ -181,7 +179,9 @@ export const GameOfLife: React.FC<{
     <canvas
       tabIndex={0}
       onMouseDown={handleClick}
-      onContextMenu={(e) => e.preventDefault()}
+      onContextMenu={(e) => {
+        e.preventDefault();
+      }}
       width={width * cellSize}
       height={height * cellSize}
       ref={canvasRef}

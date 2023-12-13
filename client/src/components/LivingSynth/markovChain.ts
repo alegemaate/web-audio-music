@@ -8,21 +8,22 @@ export class MarkovChain {
 
   private current: string;
 
-  constructor(values: Sequence[], start: string) {
+  public constructor(values: Sequence[], start: string) {
     this.chain = {};
-    for (let i = 0; i < values.length; i++) {
-      let seq = values[i];
-      if (!this.chain[seq.current]) {
+
+    for (const seq of values) {
+      if (!(this.chain[seq.current] as string[] | undefined)) {
         this.chain[seq.current] = [];
       }
+
       this.chain[seq.current].push(seq.next);
     }
 
     this.current = start;
   }
 
-  next(): string {
-    const currentChain = this.chain[this.current];
+  public next(): string {
+    const currentChain = this.chain[this.current] as string[] | undefined;
 
     if (currentChain) {
       this.current =

@@ -1,14 +1,20 @@
 import React from "react";
-import { Box, Container, makeStyles } from "@material-ui/core";
+import {
+  Box,
+  Container,
+  ThemeProvider,
+  createTheme,
+  makeStyles,
+} from "@material-ui/core";
 
 import { ConnectForm } from "./ConnectForm";
 import { AppDrawer } from "./AppDrawer";
 import { AppTopBar } from "./AppTopBar";
 
-export type WsArgs = {
+export interface WsArgs {
   address: string;
   args: (number | string)[];
-};
+}
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -16,7 +22,20 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export const Layout: React.FC = ({ children }) => {
+const theme = createTheme({
+  typography: {
+    h1: {
+      fontSize: "1.2rem",
+      "@media (min-width:600px)": {
+        fontSize: "1.5rem",
+      },
+    },
+  },
+});
+
+export const Layout: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [client, setClient] = React.useState<WebSocket | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -40,7 +59,7 @@ export const Layout: React.FC = ({ children }) => {
     setLoading(true);
     setError("");
 
-    if (!/^wss:[\w]*\/\/./u.exec(url)) {
+    if (!/^wss:\w*\/\/./u.exec(url)) {
       setError("Invalid wss string");
       setLoading(false);
       return;
@@ -56,8 +75,8 @@ export const Layout: React.FC = ({ children }) => {
       window.localStorage.setItem("wssurl", url);
     };
 
-    ws.onerror = (error) => {
-      console.log("Connection Error: ", error);
+    ws.onerror = (err) => {
+      console.log("Connection Error: ", err);
       setLoading(false);
       setError("Connection failed");
     };
@@ -69,39 +88,38 @@ export const Layout: React.FC = ({ children }) => {
 
     ws.onmessage = (message) => {
       if (message.type === "utf8") {
-        console.log("Received: '" + message.data + "'");
+        console.log(`Received: '${message.data}'`);
       }
     };
   };
 
-  const playNote = (args: WsArgs) => {
-    if (client) {
-      console.log("Playing note ", args);
-      client.send(JSON.stringify(args));
-    }
-  };
-
   return (
-    <div className={classes.root} style={{ userSelect: "none" }}>
-      <AppTopBar
-        onConnect={() => setConnectOpen(true)}
-        onDisconnect={handleDisconnect}
-        toggleDrawer={toggleDrawer}
-        url={client?.url}
-      />
-      <AppDrawer open={drawerOpen} toggle={toggleDrawer} />
-      <ConnectForm
-        loading={loading}
-        onSubmit={connectWebsocket}
-        open={connectOpen}
-        error={error}
-        onClose={() => setConnectOpen(false)}
-      />
-      <Container maxWidth="md">
-        <Box maxWidth="md" mt={4}>
-          {children}
-        </Box>
-      </Container>
-    </div>
+    <ThemeProvider theme={theme}>
+      <div className={classes.root} style={{ userSelect: "none" }}>
+        <AppTopBar
+          onConnect={() => {
+            setConnectOpen(true);
+          }}
+          onDisconnect={handleDisconnect}
+          toggleDrawer={toggleDrawer}
+          url={client?.url}
+        />
+        <AppDrawer open={drawerOpen} toggle={toggleDrawer} />
+        <ConnectForm
+          loading={loading}
+          onSubmit={connectWebsocket}
+          open={connectOpen}
+          error={error}
+          onClose={() => {
+            setConnectOpen(false);
+          }}
+        />
+        <Container maxWidth="md">
+          <Box maxWidth="md" mt={4}>
+            {children}
+          </Box>
+        </Container>
+      </div>
+    </ThemeProvider>
   );
 };

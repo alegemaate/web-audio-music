@@ -1,7 +1,9 @@
-// Type definitions for gyronorm 2.0
-// Project: https://github.com/dorukeker/gyronorm.js
-// Definitions by: Evan Shortiss <https://github.com/evanshortiss>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
+/*
+ * Type definitions for gyronorm 2.0
+ * Project: https://github.com/dorukeker/gyronorm.js
+ * Definitions by: Evan Shortiss <https://github.com/evanshortiss>
+ * Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
+ */
 
 declare module "gyronorm" {
   export interface MotionAndOrientationPayload {
@@ -73,11 +75,15 @@ declare module "gyronorm" {
     constructor();
 
     static GAME: string;
+
     static WORLD: string;
 
     static DEVICE_ORIENTATION: string;
+
     static ACCELERATION: string;
+
     static ACCELERATION_INCLUDING_GRAVITY: string;
+
     static ROTATION_RATE: string;
 
     init(options: Options): Promise<void>;

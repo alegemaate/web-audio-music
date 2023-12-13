@@ -12,12 +12,12 @@ interface FmAdsrPreset {
 }
 
 interface FmOpPreset {
-  type: "sawtooth" | "sine" | "square" | "triangle" | "custom";
+  type: "custom" | "sawtooth" | "sine" | "square" | "triangle";
   custom?: {
     real: Float32Array;
     imag: Float32Array;
   };
-  dest: "op1" | "op2" | "out" | "blackhole";
+  dest: "blackhole" | "op1" | "op2" | "out";
   ratio: number;
   adsr: FmAdsrPreset;
   feedback: number;
@@ -53,7 +53,7 @@ export class FmSynth {
   public constructor(
     context: AudioContext,
     output: GainNode,
-    recorder?: MediaStreamAudioDestinationNode
+    recorder?: MediaStreamAudioDestinationNode,
   ) {
     // Create audio context
     this.context = context;
@@ -90,12 +90,13 @@ export class FmSynth {
     this.op2.start();
 
     // Setup preset
+    // eslint-disable-next-line @typescript-eslint/prefer-destructuring
     this.preset = FM_INSTRUMENTS[0];
     this.changeInstrument(this.preset);
   }
 
   public programChange(instrument: number): void {
-    const preset = FM_INSTRUMENTS[instrument];
+    const preset = FM_INSTRUMENTS[instrument] as FmPreset | undefined;
 
     if (!preset) {
       return;
@@ -112,7 +113,7 @@ export class FmSynth {
     if (preset.op1.type === "custom" && preset.op1.custom) {
       const wave = this.context.createPeriodicWave(
         preset.op1.custom.real,
-        preset.op1.custom.imag
+        preset.op1.custom.imag,
       );
       this.op1.setPeriodicWave(wave);
     } else {
@@ -122,7 +123,7 @@ export class FmSynth {
     if (preset.op2.type === "custom" && preset.op2.custom) {
       const wave = this.context.createPeriodicWave(
         preset.op2.custom.real,
-        preset.op2.custom.imag
+        preset.op2.custom.imag,
       );
       this.op2.setPeriodicWave(wave);
     } else {
@@ -186,18 +187,18 @@ export class FmSynth {
     this.op1Gain.gain.setValueAtTime(0, now);
     this.op1Gain.gain.linearRampToValueAtTime(
       this.preset.op1.adsr.attackLevel * this.preset.op1.level,
-      now + this.preset.op1.adsr.attackTime
+      now + this.preset.op1.adsr.attackTime,
     );
     this.op1Gain.gain.linearRampToValueAtTime(
       this.preset.op1.adsr.decayLevel * this.preset.op1.level,
-      now + this.preset.op1.adsr.attackTime + this.preset.op1.adsr.decayTime
+      now + this.preset.op1.adsr.attackTime + this.preset.op1.adsr.decayTime,
     );
     this.op1Gain.gain.linearRampToValueAtTime(
       this.preset.op1.adsr.sustainLevel * this.preset.op1.level,
       now +
         this.preset.op1.adsr.attackTime +
         this.preset.op1.adsr.decayTime +
-        this.preset.op1.adsr.sustainTime
+        this.preset.op1.adsr.sustainTime,
     );
 
     // Op 2 ADSR
@@ -205,18 +206,18 @@ export class FmSynth {
     this.op2Gain.gain.setValueAtTime(0, now);
     this.op2Gain.gain.linearRampToValueAtTime(
       this.preset.op2.adsr.attackLevel * this.preset.op2.level,
-      now + this.preset.op2.adsr.attackTime
+      now + this.preset.op2.adsr.attackTime,
     );
     this.op2Gain.gain.linearRampToValueAtTime(
       this.preset.op2.adsr.decayLevel * this.preset.op2.level,
-      now + this.preset.op2.adsr.attackTime + this.preset.op2.adsr.decayTime
+      now + this.preset.op2.adsr.attackTime + this.preset.op2.adsr.decayTime,
     );
     this.op2Gain.gain.linearRampToValueAtTime(
       this.preset.op2.adsr.sustainLevel * this.preset.op2.level,
       now +
         this.preset.op2.adsr.attackTime +
         this.preset.op2.adsr.decayTime +
-        this.preset.op2.adsr.sustainTime
+        this.preset.op2.adsr.sustainTime,
     );
   }
 
@@ -228,7 +229,7 @@ export class FmSynth {
     this.op1Gain.gain.setValueAtTime(this.op1Gain.gain.value, now);
     this.op1Gain.gain.linearRampToValueAtTime(
       this.preset.op1.adsr.releaseLevel * this.preset.op1.level,
-      now + this.preset.op1.adsr.releaseTime
+      now + this.preset.op1.adsr.releaseTime,
     );
 
     // Op 2 ADSR
@@ -236,7 +237,7 @@ export class FmSynth {
     this.op2Gain.gain.setValueAtTime(this.op2Gain.gain.value, now);
     this.op2Gain.gain.linearRampToValueAtTime(
       this.preset.op2.adsr.releaseLevel * this.preset.op2.level,
-      now + this.preset.op2.adsr.releaseTime
+      now + this.preset.op2.adsr.releaseTime,
     );
   }
 
@@ -249,7 +250,7 @@ export class FmSynth {
     this.op2Feedback.disconnect();
     this.gain.disconnect();
     if (this.context.state !== "closed") {
-      this.context.close();
+      this.context.close().catch(console.error);
       this.op1.stop();
       this.op2.stop();
     }

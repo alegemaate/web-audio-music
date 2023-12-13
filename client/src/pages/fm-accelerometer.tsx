@@ -5,13 +5,15 @@ import {
   CardActions,
   CardContent,
   Slider,
+  Typography,
 } from "@material-ui/core";
 import { VolumeUp, Waves } from "@material-ui/icons";
 
-import { AccelPad, AccelParams } from "../components/AccelPad";
+import { AccelPad, type AccelParams } from "../components/AccelPad";
 import { rangeMap } from "../helpers/helpers";
 import { useAudioContext } from "../hooks/useAudioContext";
 import { Layout } from "../components/Layout";
+import { Seo } from "../components/Seo";
 
 const MAX_GAIN_1 = 10000;
 const MAX_GAIN_2 = 1000;
@@ -37,71 +39,71 @@ const FmAccelerometer: React.FC = () => {
 
     // Create audio context
     if (context.state === "suspended") {
-      context.resume();
+      context.resume().catch(console.error);
     }
 
     // Instantiating
-    const mod1 = context.createOscillator(); // Modulator 1
-    const mod2 = context.createOscillator(); // Modulator 2
+    const osc1 = context.createOscillator(); // Modulator 1
+    const osc2 = context.createOscillator(); // Modulator 2
     const carrier = context.createOscillator(); // Carrier
     carrier.type = "sine";
 
     // Setting frequencies
-    mod1.frequency.value = freq1Val;
-    mod2.frequency.value = freq2Val;
-    mod1.type = "sawtooth";
-    mod2.type = "square";
+    osc1.frequency.value = freq1Val;
+    osc2.frequency.value = freq2Val;
+    osc1.type = "sawtooth";
+    osc2.type = "square";
     carrier.frequency.value = 440;
 
     // Modulation depth
-    const mod1Gain = context.createGain();
-    mod1Gain.gain.value = gain1Val;
-    const mod2Gain = context.createGain();
-    mod2Gain.gain.value = gain2Val;
+    const osc1Gain = context.createGain();
+    osc1Gain.gain.value = gain1Val;
+    const osc2Gain = context.createGain();
+    osc2Gain.gain.value = gain2Val;
     const mainGain = context.createGain();
     mainGain.gain.value = 0.5;
 
     // Wiring everything up
-    mod1.connect(mod1Gain);
-    mod2.connect(mod2Gain);
-    mod1Gain.connect(carrier.frequency);
-    mod2Gain.connect(mod1.frequency);
+    osc1.connect(osc1Gain);
+    osc2.connect(osc2Gain);
+    osc1Gain.connect(carrier.frequency);
+    osc2Gain.connect(osc1.frequency);
     carrier.connect(mainGain);
     mainGain.connect(gain);
 
     // Start making sound
-    mod1.start();
-    mod2.start();
+    osc1.start();
+    osc2.start();
     carrier.start();
 
-    setMod1(mod1);
-    setGain1(mod1Gain);
-    setMod2(mod2);
-    setGain2(mod2Gain);
+    setMod1(osc1);
+    setGain1(osc1Gain);
+    setMod2(osc2);
+    setGain2(osc2Gain);
   };
 
-  const handleFreq1Change = (_event: unknown, value: number | number[]) => {
+  const handleFreq1Change = (_event: unknown, value: number[] | number) => {
     if (mod1 && typeof value === "number") {
       mod1.frequency.value = value;
       setFreq1Val(mod1.frequency.value);
     }
   };
 
-  const handleFreq2Change = (_event: unknown, value: number | number[]) => {
+  const handleFreq2Change = (_event: unknown, value: number[] | number) => {
     if (mod2 && typeof value === "number") {
       mod2.frequency.value = value;
       setFreq2Val(mod2.frequency.value);
     }
   };
 
-  const handleGain1Change = (_event: unknown, value: number | number[]) => {
+  const handleGain1Change = (_event: unknown, value: number[] | number) => {
     if (gain1 && typeof value === "number") {
       gain1.gain.value = value;
       setGain1Val(gain1.gain.value);
     }
   };
 
-  const handleGain2Change = (_event: unknown, value: number | number[]) => {
+  const handleGain2Change = (_event: unknown, value: number[] | number) => {
     if (gain2 && typeof value === "number") {
       gain2.gain.value = value;
       setGain2Val(gain2.gain.value);
@@ -125,6 +127,10 @@ const FmAccelerometer: React.FC = () => {
 
   return (
     <Layout>
+      <Typography variant="h1">FM Accelerometer</Typography>
+      <Typography variant="body1" style={{ marginBottom: 16 }}>
+        Device orientation controlled FM synthesizer.
+      </Typography>
       <Card>
         <CardContent>
           {!mod1 && (
@@ -199,3 +205,10 @@ const FmAccelerometer: React.FC = () => {
 };
 
 export default FmAccelerometer;
+
+export const Head = (): JSX.Element => (
+  <Seo
+    title="FM Accelerometer"
+    description="Accelerometer Controlled FM Synthesizer"
+  />
+);

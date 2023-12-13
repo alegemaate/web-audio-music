@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import clap from "../audio/clap.wav";
 import metal from "../audio/metal.wav";
 import kick from "../audio/kick.wav";
@@ -34,7 +35,7 @@ export class DrumMachine {
   public constructor(
     context: AudioContext,
     output: GainNode,
-    recorder?: MediaStreamAudioDestinationNode
+    recorder?: MediaStreamAudioDestinationNode,
   ) {
     // Create audio context
     this.context = context;
@@ -84,16 +85,18 @@ export class DrumMachine {
   }
 
   public play(data: number[]): void {
+    this.gain.gain.value = 0.1;
+
     this.samples.forEach((sample, i) => {
       if (data[i]) {
         sample.mediaElement.currentTime = 0;
-        sample.mediaElement.play();
+        sample.mediaElement.play().catch(console.error);
       }
     });
   }
 
   public stop(): void {
-    this.gain.disconnect();
+    this.gain.gain.value = 0.0;
   }
 
   public setVol(vol: number): void {

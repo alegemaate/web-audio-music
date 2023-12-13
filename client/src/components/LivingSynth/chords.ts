@@ -5,8 +5,8 @@ export const getChord = (transpose: number, chord: string): number[] => {
     return [];
   }
 
-  let nums: number[] = getChordType(type);
-  let offset = getChordOffset(key);
+  const nums: number[] = getChordType(type);
+  const offset = getChordOffset(key);
 
   return nums.map((n) => n + 24 + transpose + offset);
 };

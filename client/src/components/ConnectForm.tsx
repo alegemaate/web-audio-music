@@ -24,7 +24,6 @@ export const ConnectForm: React.FC<{
   };
 
   const handleSubmit = () => {
-    console.log(url);
     onSubmit(url);
   };
 
@@ -55,7 +54,7 @@ export const ConnectForm: React.FC<{
           id="url"
           fullWidth
           disabled={loading}
-          error={!!error}
+          error={Boolean(error)}
           helperText={error}
         />
       </DialogContent>

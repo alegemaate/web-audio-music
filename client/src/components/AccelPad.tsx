@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import React from "react";
 import { colorMap, rangeMap } from "../helpers/helpers";
 import GyroNorm from "gyronorm";
@@ -6,15 +8,15 @@ import { Error } from "@material-ui/icons";
 
 const DOT_SIZE = 100;
 
-export type AccelParams = {
+export interface AccelParams {
   alpha: number;
   beta: number;
   gamma: number;
-};
+}
 
 export const AccelPad: React.FC<{
   onChange?: (args: AccelParams) => void;
-  onClick?: (status: "on" | "off") => void;
+  onClick?: (status: "off" | "on") => void;
 }> = ({ onChange, onClick }) => {
   const [hasMotionDevice, setHasMotionDevice] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -53,7 +55,7 @@ export const AccelPad: React.FC<{
             dotRef.current.style.backgroundColor = `rgb(255,${colorMap(
               beta,
               -180,
-              180
+              180,
             )},${colorMap(gamma, -90, 90)})`;
 
             dotRef.current.style.borderRadius = `${rangeMap(
@@ -61,7 +63,7 @@ export const AccelPad: React.FC<{
               0,
               360,
               0,
-              50
+              50,
             )}%`;
 
             onChange?.({ alpha, beta, gamma });
@@ -75,11 +77,13 @@ export const AccelPad: React.FC<{
   };
 
   const motionAccess = () => {
-    if (!window.DeviceMotionEvent?.requestPermission) {
+    // @ts-expect-error - typescript doesn't know about this
+    if (!DeviceMotionEvent.requestPermission) {
       initMotion();
     }
 
-    window.DeviceMotionEvent?.requestPermission?.().then((response) => {
+    // @ts-expect-error - typescript doesn't know about this
+    DeviceMotionEvent.requestPermission?.().then((response) => {
       if (response === "granted") {
         initMotion();
       }
@@ -87,67 +91,65 @@ export const AccelPad: React.FC<{
   };
 
   return (
-    <>
-      <Card>
-        {!hasMotionDevice && (
-          <CardContent>
-            <Button
-              onClick={motionAccess}
-              variant="outlined"
-              color="primary"
-              fullWidth
-            >
-              No motion device detected. Click to request access
-            </Button>
+    <Card>
+      {!hasMotionDevice && (
+        <CardContent>
+          <Button
+            onClick={motionAccess}
+            variant="outlined"
+            color="primary"
+            fullWidth
+          >
+            No motion device detected. Click to request access
+          </Button>
 
-            {error && (
-              <Box>
-                <Error color="error" />
-                <Typography gutterBottom variant="caption">
-                  {error}
-                </Typography>
-              </Box>
-            )}
-          </CardContent>
-        )}
+          {error && (
+            <Box>
+              <Error color="error" />
+              <Typography gutterBottom variant="caption">
+                {error}
+              </Typography>
+            </Box>
+          )}
+        </CardContent>
+      )}
+      <div
+        ref={boardRef}
+        style={{
+          width: "100%",
+          height: "300px",
+          position: "relative",
+          overflow: "hidden",
+          margin: "0 auto",
+          backgroundColor: "#CCC",
+        }}
+      >
         <div
-          ref={boardRef}
+          ref={dotRef}
           style={{
-            width: "100%",
-            height: "300px",
-            position: "relative",
-            overflow: "hidden",
-            margin: "0 auto",
-            backgroundColor: "#CCC",
+            width: DOT_SIZE,
+            height: DOT_SIZE,
+            backgroundColor: "rgba(0, 0, 0 ,0)",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            borderRadius: "50%",
+            transition: "all 0.04s",
           }}
-        >
-          <div
-            ref={dotRef}
-            style={{
-              width: DOT_SIZE,
-              height: DOT_SIZE,
-              backgroundColor: "rgba(0, 0, 0 ,0)",
-              position: "absolute",
-              top: 0,
-              left: 0,
-              borderRadius: "50%",
-              transition: "all 0.04s",
-            }}
-          />
-          <div
-            onTouchStart={() => onClick?.("on")}
-            onTouchEnd={() => onClick?.("off")}
-            style={{
-              position: "absolute",
-              backgroundColor: "rgba(0,0,0,0)",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-            }}
-          />
-        </div>
-      </Card>
-    </>
+        />
+        <div
+          onTouchStart={() => onClick?.("on")}
+          onTouchEnd={() => onClick?.("off")}
+          style={{
+            position: "absolute",
+            backgroundColor: "rgba(0,0,0,0)",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+          }}
+        />
+      </div>
+    </Card>
   );
 };

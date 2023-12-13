@@ -8,15 +8,16 @@ import {
 import { Timelapse, Timer } from "@material-ui/icons";
 import React from "react";
 
-import { Layout, WsArgs } from "../components/Layout";
+import { Layout, type WsArgs } from "../components/Layout";
 import { rangeMap } from "../helpers/helpers";
+import { Seo } from "../components/Seo";
 
-export type ClickHistory = {
+export interface ClickHistory {
   x: number;
   y: number;
   time: number;
   index: number;
-};
+}
 
 const ClickDot: React.FC<{
   click: ClickHistory;
@@ -24,7 +25,7 @@ const ClickDot: React.FC<{
   boardWidth: number;
   maxTime: number;
 }> = ({ click, timer, boardWidth, maxTime }) => {
-  let timerDiff =
+  const timerDiff =
     (Math.sin(((timer - click.time) / (maxTime / 2) + 0.5) * Math.PI) + 1) *
     0.5;
 
@@ -60,14 +61,13 @@ const OscBloom: React.FC<{ onTransmit: (args: WsArgs) => void }> = ({
     (click: ClickHistory) => {
       const freq = rangeMap(click.x, 0, size.width, 20, 2000);
       const vol = rangeMap(click.y, 0, size.height, 0, 1);
-      console.log("Playing note ", freq, vol);
 
       onTransmit({
         address: "/chuck/oscnote",
         args: [freq, vol, click.index],
       });
     },
-    [onTransmit, size]
+    [onTransmit, size],
   );
 
   React.useEffect(() => {
@@ -79,12 +79,16 @@ const OscBloom: React.FC<{ onTransmit: (args: WsArgs) => void }> = ({
 
       clickHistory
         .filter((click) => click.time === newTime)
-        .forEach((click) => playNote(click));
+        .forEach((click) => {
+          playNote(click);
+        });
 
       setTimer(newTime);
     }, 100);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [playNote, clickHistory, timer, maxTime]);
 
   React.useEffect(() => {
@@ -96,7 +100,7 @@ const OscBloom: React.FC<{ onTransmit: (args: WsArgs) => void }> = ({
     }
   }, [boardRef]);
 
-  const mouseMoved = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const mouseMoved = (event: React.MouseEvent<HTMLDivElement>) => {
     const { nativeEvent } = event;
     const x = nativeEvent.offsetX;
     const y = nativeEvent.offsetY;
@@ -107,14 +111,12 @@ const OscBloom: React.FC<{ onTransmit: (args: WsArgs) => void }> = ({
         0,
         size.width,
         0,
-        255
+        255,
       )}, ${rangeMap(y, 0, size.height, 0, 255)})`;
     }
   };
 
-  const mouseClicked = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
+  const mouseClicked = (event: React.MouseEvent<HTMLDivElement>) => {
     const { nativeEvent } = event;
     const x = nativeEvent.offsetX;
     const y = nativeEvent.offsetY;
@@ -134,7 +136,7 @@ const OscBloom: React.FC<{ onTransmit: (args: WsArgs) => void }> = ({
     setClickHistory([]);
   };
 
-  const handleMaxTimeChange = (_event: unknown, value: number | number[]) => {
+  const handleMaxTimeChange = (_event: unknown, value: number[] | number) => {
     if (typeof value === "number") {
       setMaxTime(value);
     }
@@ -142,6 +144,11 @@ const OscBloom: React.FC<{ onTransmit: (args: WsArgs) => void }> = ({
 
   return (
     <Layout>
+      <Typography variant="h1">OSC Bloom</Typography>
+      <Typography variant="body1" style={{ marginBottom: 16 }}>
+        Click to play a note, and watch the bloom! Requires server running on
+        localhost:8888
+      </Typography>
       <Card>
         <div
           ref={boardRef}
@@ -196,3 +203,10 @@ const OscBloom: React.FC<{ onTransmit: (args: WsArgs) => void }> = ({
 };
 
 export default OscBloom;
+
+export const Head = (): JSX.Element => (
+  <Seo
+    title="OSC Bloom"
+    description="Click to play a note, and watch the bloom! Requires server running on localhost:8888"
+  />
+);

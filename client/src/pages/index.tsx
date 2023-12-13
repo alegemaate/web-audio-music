@@ -12,6 +12,7 @@ import {
 
 import { MODULES } from "../constants/modules";
 import { Layout } from "../components/Layout";
+import { Seo } from "../components/Seo";
 
 const useStyles = makeStyles({
   card: {
@@ -27,6 +28,10 @@ const Dashboard: React.FC = () => {
 
   return (
     <Layout>
+      <Typography variant="h1">Dashboard</Typography>
+      <Typography variant="body1" style={{ marginBottom: 16 }}>
+        View all modules available on the Web Audio Playground.
+      </Typography>
       <Grid container spacing={1}>
         {MODULES.filter((mod) => mod.dashboard).map((mod) => (
           <Grid xs={6} item key={mod.name}>
@@ -61,3 +66,10 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
+
+export const Head = (): JSX.Element => (
+  <Seo
+    title="All Modules"
+    description="View all modules available on the Web Audio Playground."
+  />
+);

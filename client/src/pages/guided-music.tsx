@@ -22,6 +22,7 @@ import { CubeInput } from "../components/CubeInput";
 import { DotDraw } from "../components/DotDraw";
 import { SetInterval } from "../helpers/SetInterval";
 import { Layout } from "../components/Layout";
+import { Seo } from "../components/Seo";
 
 const GuidedMusic: React.FC = () => {
   const { context, analyser, gain } = useAudioContext();
@@ -55,15 +56,15 @@ const GuidedMusic: React.FC = () => {
       return;
     }
 
-    if (!fmSynth) {
+    if (fmSynth) {
+      console.log("stopping");
+      fmSynth.stop();
+    } else {
       if (context.state === "suspended") {
-        context.resume();
+        context.resume().catch(console.error);
       }
 
       setFmSynth(new Controller(context, gain));
-    } else {
-      console.log("stopping");
-      fmSynth.stop();
     }
   };
 
@@ -85,6 +86,13 @@ const GuidedMusic: React.FC = () => {
 
   return (
     <Layout>
+      <Typography variant="h1">Guided Music</Typography>
+      <Typography variant="body1" style={{ marginBottom: 16 }}>
+        This is an experimental guided music controller based on Conways Game of
+        Life. It is a work in progress and will be updated as I continue to work
+        on it.
+      </Typography>
+
       <Grid container spacing={2} alignItems="stretch">
         <Grid item lg={6} md={6} sm={6}>
           <Card>
@@ -250,9 +258,9 @@ const GuidedMusic: React.FC = () => {
                 control={
                   <Checkbox
                     checked={shouldSimSynth}
-                    onChange={(_event: unknown, value: boolean) =>
-                      setShouldSimSynth(value)
-                    }
+                    onChange={(_event: unknown, value: boolean) => {
+                      setShouldSimSynth(value);
+                    }}
                   />
                 }
                 label="Step Forward"
@@ -261,9 +269,9 @@ const GuidedMusic: React.FC = () => {
                 control={
                   <Checkbox
                     checked={stepBackSynth}
-                    onChange={(_event: unknown, value: boolean) =>
-                      setStepBackSynth(value)
-                    }
+                    onChange={(_event: unknown, value: boolean) => {
+                      setStepBackSynth(value);
+                    }}
                   />
                 }
                 label="Step Back"
@@ -296,9 +304,9 @@ const GuidedMusic: React.FC = () => {
                 control={
                   <Checkbox
                     checked={shouldSimDrum}
-                    onChange={(_event: unknown, value: boolean) =>
-                      setShouldSimDrum(value)
-                    }
+                    onChange={(_event: unknown, value: boolean) => {
+                      setShouldSimDrum(value);
+                    }}
                   />
                 }
                 label="Step Forward"
@@ -307,9 +315,9 @@ const GuidedMusic: React.FC = () => {
                 control={
                   <Checkbox
                     checked={stepBackDrum}
-                    onChange={(_event: unknown, value: boolean) =>
-                      setStepBackDrum(value)
-                    }
+                    onChange={(_event: unknown, value: boolean) => {
+                      setStepBackDrum(value);
+                    }}
                   />
                 }
                 label="Step Back"
@@ -387,3 +395,10 @@ const GuidedMusic: React.FC = () => {
 };
 
 export default GuidedMusic;
+
+export const Head = (): JSX.Element => (
+  <Seo
+    title="Guided Music"
+    description="Experimental guided music controller based on Conways Game of Life"
+  />
+);

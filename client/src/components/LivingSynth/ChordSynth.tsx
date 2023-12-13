@@ -55,7 +55,7 @@ export class ChordSynth {
         op.osc.frequency.setValueAtTime(op.osc.frequency.value, now);
         op.osc.frequency.linearRampToValueAtTime(notes[i][0], now + duration);
       } else {
-        //op.oscGain.gain.value = 0;
+        // Op.oscGain.gain.value = 0;
       }
     });
   }

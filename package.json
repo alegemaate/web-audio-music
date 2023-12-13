@@ -11,6 +11,6 @@
     "start:client": "cd client && yarn start"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=20"
   }
 }
