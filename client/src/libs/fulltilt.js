@@ -215,7 +215,7 @@
           sX * cY * cZ - cX * sY * sZ, // x
           cX * sY * cZ + sX * cY * sZ, // y
           cX * cY * sZ + sX * sY * cZ, // z
-          cX * cY * cZ - sX * sY * sZ // w
+          cX * cY * cZ - sX * sY * sZ, // w
         );
 
         this.normalize();
@@ -234,7 +234,7 @@
           0.5 * Math.sqrt(1 + R[0] - R[4] - R[8]) * sign(R[7] - R[5]), // x
           0.5 * Math.sqrt(1 - R[0] + R[4] - R[8]) * sign(R[2] - R[6]), // y
           0.5 * Math.sqrt(1 - R[0] - R[4] + R[8]) * sign(R[3] - R[1]), // z
-          0.5 * Math.sqrt(1 + R[0] + R[4] + R[8]) // w
+          0.5 * Math.sqrt(1 + R[0] + R[4] + R[8]), // w
         );
 
         return this;
@@ -244,7 +244,7 @@
     this.multiply = function (quaternion) {
       outQuat = FULLTILT.Quaternion.prototype.multiplyQuaternions(
         this,
-        quaternion
+        quaternion,
       );
       this.copy(outQuat);
 
@@ -255,7 +255,7 @@
       outQuat = FULLTILT.Quaternion.prototype.rotateByAxisAngle(
         this,
         [1, 0, 0],
-        angle
+        angle,
       );
       this.copy(outQuat);
 
@@ -266,7 +266,7 @@
       outQuat = FULLTILT.Quaternion.prototype.rotateByAxisAngle(
         this,
         [0, 1, 0],
-        angle
+        angle,
       );
       this.copy(outQuat);
 
@@ -277,7 +277,7 @@
       outQuat = FULLTILT.Quaternion.prototype.rotateByAxisAngle(
         this,
         [0, 0, 1],
-        angle
+        angle,
       );
       this.copy(outQuat);
 
@@ -312,7 +312,7 @@
           qax * qbw + qaw * qbx + qay * qbz - qaz * qby, // x
           qay * qbw + qaw * qby + qaz * qbx - qax * qbz, // y
           qaz * qbw + qaw * qbz + qax * qby - qay * qbx, // z
-          qaw * qbw - qax * qbx - qay * qby - qaz * qbz // w
+          qaw * qbw - qax * qbx - qay * qby - qaz * qbz, // w
         );
 
         return multipliedQuat;
@@ -353,13 +353,13 @@
           (axis[0] || 0) * sA, // x
           (axis[1] || 0) * sA, // y
           (axis[2] || 0) * sA, // z
-          Math.cos(halfAngle) // w
+          Math.cos(halfAngle), // w
         );
 
         // Multiply quaternion by q
         outputQuaternion = FULLTILT.Quaternion.prototype.multiplyQuaternions(
           targetQuaternion,
-          transformQuaternion
+          transformQuaternion,
         );
 
         return FULLTILT.Quaternion.prototype.normalize(outputQuaternion);
@@ -378,7 +378,7 @@
     m23,
     m31,
     m32,
-    m33
+    m33,
   ) {
     var outMatrix;
 
@@ -447,7 +447,7 @@
 
           -cX * sY, // 3,1
           sX, // 3,2
-          cX * cY // 3,3
+          cX * cY, // 3,3
         );
 
         this.normalize();
@@ -476,7 +476,7 @@
 
           2 * (q.x * q.z - q.w * q.y), // 3,1
           2 * (q.y * q.z + q.w * q.x), // 3,2
-          sqw - sqx - sqy + sqz // 3,3
+          sqw - sqx - sqy + sqz, // 3,3
         );
 
         return this;
@@ -494,7 +494,7 @@
       outMatrix = FULLTILT.RotationMatrix.prototype.rotateByAxisAngle(
         this,
         [1, 0, 0],
-        angle
+        angle,
       );
       this.copy(outMatrix);
 
@@ -505,7 +505,7 @@
       outMatrix = FULLTILT.RotationMatrix.prototype.rotateByAxisAngle(
         this,
         [0, 1, 0],
-        angle
+        angle,
       );
       this.copy(outMatrix);
 
@@ -516,7 +516,7 @@
       outMatrix = FULLTILT.RotationMatrix.prototype.rotateByAxisAngle(
         this,
         [0, 0, 1],
-        angle
+        angle,
       );
       this.copy(outMatrix);
 
@@ -554,7 +554,7 @@
 
           aE[6] * bE[0] + aE[7] * bE[3] + aE[8] * bE[6],
           aE[6] * bE[1] + aE[7] * bE[4] + aE[8] * bE[7],
-          aE[6] * bE[2] + aE[7] * bE[5] + aE[8] * bE[8]
+          aE[6] * bE[2] + aE[7] * bE[5] + aE[8] * bE[8],
         );
 
         return matrix;
@@ -636,12 +636,11 @@
         if (validAxis) {
           outputMatrix = FULLTILT.RotationMatrix.prototype.multiplyMatrices(
             targetRotationMatrix,
-            transformMatrix
+            transformMatrix,
           );
 
-          outputMatrix = FULLTILT.RotationMatrix.prototype.normalize(
-            outputMatrix
-          );
+          outputMatrix =
+            FULLTILT.RotationMatrix.prototype.normalize(outputMatrix);
         } else {
           outputMatrix = targetRotationMatrix;
         }
@@ -815,7 +814,7 @@
         _matrix = FULLTILT.RotationMatrix.prototype.rotateByAxisAngle(
           _matrix,
           axis,
-          angle
+          angle,
         );
 
         targetEuler.setFromRotationMatrix(_matrix);
@@ -851,7 +850,7 @@
             window.removeEventListener(
               "deviceorientation",
               setGameAlphaOffset,
-              false
+              false,
             );
             return;
           }
@@ -861,7 +860,7 @@
           window.removeEventListener(
             "deviceorientation",
             setGameAlphaOffset,
-            false
+            false,
           );
         }
       }.bind(this);
@@ -881,7 +880,7 @@
           this.alphaOffsetDevice = new FULLTILT.Euler(
             evt.webkitCompassHeading,
             0,
-            0
+            0,
           );
           this.alphaOffsetDevice.rotateZ(screenOrientationAngle);
           this.alphaOffsetScreen = screenOrientationAngle;
@@ -891,7 +890,7 @@
             window.removeEventListener(
               "deviceorientation",
               setCompassAlphaOffset,
-              false
+              false,
             );
             return;
           }
@@ -901,7 +900,7 @@
           window.removeEventListener(
             "deviceorientation",
             setCompassAlphaOffset,
-            false
+            false,
           );
         }
       }.bind(this);
@@ -909,7 +908,7 @@
       window.addEventListener(
         "deviceorientation",
         setCompassAlphaOffset,
-        false
+        false,
       );
     } // else... use whatever orientation system the UA provides ("game" on iOS, "world" on Android)
   };
@@ -930,13 +929,13 @@
           window.screen.orientation.addEventListener(
             "change",
             handleScreenOrientationChange,
-            false
+            false,
           );
         } else {
           window.addEventListener(
             "orientationchange",
             handleScreenOrientationChange,
-            false
+            false,
           );
         }
       }
@@ -945,7 +944,7 @@
         window.addEventListener(
           "deviceorientation",
           handleDeviceOrientationChange,
-          false
+          false,
         );
 
         sensors.orientation.active = true;
@@ -957,7 +956,7 @@
         window.removeEventListener(
           "deviceorientation",
           handleDeviceOrientationChange,
-          false
+          false,
         );
 
         sensors.orientation.active = false;
@@ -1133,13 +1132,13 @@
           window.screen.orientation.addEventListener(
             "change",
             handleScreenOrientationChange,
-            false
+            false,
           );
         } else {
           window.addEventListener(
             "orientationchange",
             handleScreenOrientationChange,
-            false
+            false,
           );
         }
       }
@@ -1148,7 +1147,7 @@
         window.addEventListener(
           "devicemotion",
           handleDeviceMotionChange,
-          false
+          false,
         );
 
         sensors.motion.active = true;
@@ -1160,7 +1159,7 @@
         window.removeEventListener(
           "devicemotion",
           handleDeviceMotionChange,
-          false
+          false,
         );
 
         sensors.motion.active = false;

@@ -27,7 +27,7 @@ export class AdditiveSynth {
   public constructor(
     context: AudioContext,
     output: GainNode,
-    recorder?: MediaStreamAudioDestinationNode
+    recorder?: MediaStreamAudioDestinationNode,
   ) {
     // Create audio context
     this.context = context;
@@ -77,12 +77,12 @@ export class AdditiveSynth {
 
   public setPoints(points: { real: Float32Array; imag: Float32Array }): void {
     this.op1.setPeriodicWave(
-      this.context.createPeriodicWave(points.real, points.imag)
+      this.context.createPeriodicWave(points.real, points.imag),
     );
   }
 
   public stop(): void {
-    this.gain.disconnect();
+    this.gain.gain.value = 0.0;
   }
 
   public setVol(vol: number): void {

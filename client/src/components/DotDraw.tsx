@@ -16,32 +16,31 @@ export const DotDraw: React.FC<{
     if (parentRef.current) {
       setCanvasWidth(parentRef.current.clientWidth);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parentRef]);
 
   React.useEffect(() => {
     // Do draw
-    const render = () => {
+    const render = (): number => {
       if (!ref.current) {
-        return;
+        return 0;
       }
       const ctx = ref.current.getContext("2d");
       if (!ctx) {
-        return;
+        return 0;
       }
 
       // Get size
-      const { height, width } = ref.current;
+      const { height: h, width: w } = ref.current;
 
       // Clear
       ctx.fillStyle = "#000000";
-      ctx.fillRect(0, 0, width, height);
+      ctx.fillRect(0, 0, w, h);
 
       // Draw center line
       ctx.strokeStyle = "#FFFFFF";
       ctx.beginPath();
-      ctx.moveTo(0, height / 2);
-      ctx.lineTo(width, height / 2);
+      ctx.moveTo(0, h / 2);
+      ctx.lineTo(w, h / 2);
       ctx.stroke();
 
       // Draw blocks
@@ -49,12 +48,12 @@ export const DotDraw: React.FC<{
       let x = radius;
 
       points.forEach((val, index) => {
-        const y = height / 2 - val * (height / 2);
+        const y = h / 2 - val * (h / 2);
 
         // Draw stroke
         ctx.beginPath();
         ctx.moveTo(x, y);
-        ctx.lineTo(x, height / 2);
+        ctx.lineTo(x, h / 2);
         ctx.stroke();
 
         // Draw ellipse
@@ -82,17 +81,17 @@ export const DotDraw: React.FC<{
   }, [canvasWidth, points, samples, height]);
 
   const updatePoints = (
-    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>,
-    drawing: boolean
+    event: React.MouseEvent<HTMLCanvasElement>,
+    isDrawing: boolean,
   ) => {
-    if (!drawing) {
+    if (!isDrawing) {
       return;
     }
 
     // Get coordinates, and map to pts domain
     const bounding = event.currentTarget.getBoundingClientRect();
     const x = Math.floor(
-      (event.clientX - bounding.x) * (samples / canvasWidth)
+      (event.clientX - bounding.x) * (samples / canvasWidth),
     );
     const clickPos = event.clientY - bounding.y;
     const y = -((2 * clickPos) / height - 1);
@@ -109,9 +108,7 @@ export const DotDraw: React.FC<{
     onChange(points);
   };
 
-  const handleMouseDown = (
-    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
-  ) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     setDrawing(true);
     updatePoints(event, true);
   };
@@ -124,7 +121,9 @@ export const DotDraw: React.FC<{
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        onMouseMove={(event) => updatePoints(event, drawing)}
+        onMouseMove={(event) => {
+          updatePoints(event, drawing);
+        }}
         ref={ref}
       />
     </div>

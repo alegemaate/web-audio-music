@@ -15,9 +15,7 @@ const NOTE_NAMES = [
   "G#",
 ];
 
-const mtof = (midi: number) => {
-  return Math.pow(2, (midi - 69) / 12) * 440;
-};
+const mtof = (midi: number) => 2 ** ((midi - 69) / 12) * 440;
 
 const getNoteName = (note: number) => {
   const noteIndex = note % NOTE_NAMES.length;
@@ -30,7 +28,7 @@ export const Keyboard: React.FC<{ onClick: (note: number) => void }> = ({
 }) => {
   // Generate key index
   const keys = [];
-  for (var i = 1; i <= 88; i++) {
+  for (let i = 1; i <= 88; i++) {
     keys.push(i);
   }
 
@@ -41,7 +39,9 @@ export const Keyboard: React.FC<{ onClick: (note: number) => void }> = ({
           <button
             style={{ width: "7.5%" }}
             key={key}
-            onClick={() => onClick(mtof(key + 20))}
+            onClick={() => {
+              onClick(mtof(key + 20));
+            }}
           >
             {getNoteName(key - 1)}
           </button>

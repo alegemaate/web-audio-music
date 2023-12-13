@@ -1,11 +1,9 @@
 import { SCALES } from "./scales";
-import { FmPreset, FmSynth } from "../FmSynth";
+import { type FmPreset, FmSynth } from "../FmSynth";
 import { AdditiveSynth } from "../AdditiveSynth";
 import { DrumMachine } from "../DrumMachine";
 
-const mtof = (midi: number) => {
-  return Math.pow(2, (midi - 69) / 12) * 440;
-};
+const mtof = (midi: number) => 2 ** ((midi - 69) / 12) * 440;
 
 const PRESET: FmPreset = {
   name: "Basic",
@@ -56,8 +54,6 @@ class AudioRecorder {
   private readonly name: string;
 
   public constructor(context: AudioContext, name: string) {
-    console.log("Recorder create!");
-
     // Name
     this.name = name;
 
@@ -70,13 +66,13 @@ class AudioRecorder {
     this.recorder.ondataavailable = (evt) => {
       this.chunks.push(evt.data);
       console.log(
-        `${this.name}: Recorder data avail! Data size: ${evt.data.size}. Chunks so far: ${this.chunks.length}. Recorder state: ${this.recorder.state}`
+        `${this.name}: Recorder data avail! Data size: ${evt.data.size}. Chunks so far: ${this.chunks.length}. Recorder state: ${this.recorder.state}`,
       );
     };
 
     this.recorder.onstop = () => {
       console.log(
-        `${this.name}: Recorder stopped. Chunks recorded: ${this.chunks.length}`
+        `${this.name}: Recorder stopped. Chunks recorded: ${this.chunks.length}`,
       );
       const blob = new Blob(this.chunks, { type: "audio/ogg; codecs=opus" });
       const audioElement = document.createElement("audio");
@@ -109,17 +105,17 @@ export class Controller {
 
   private readonly gain: GainNode;
 
-  private chords: AdditiveSynth[];
+  private readonly chords: AdditiveSynth[];
 
-  private leadSynth: FmSynth;
+  private readonly leadSynth: FmSynth;
 
-  private drumMachine: DrumMachine;
+  private readonly drumMachine: DrumMachine;
 
   private scale: number[];
 
-  private preset: FmPreset = PRESET;
+  private readonly preset: FmPreset = PRESET;
 
-  private recorders: AudioRecorder[];
+  private readonly recorders: AudioRecorder[];
 
   public constructor(context: AudioContext, gain: GainNode) {
     // Create audio context
@@ -141,28 +137,28 @@ export class Controller {
 
     this.chords = [];
     this.chords.push(
-      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder()),
     );
     this.chords.push(
-      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder()),
     );
     this.chords.push(
-      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder()),
     );
     this.chords.push(
-      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder()),
     );
     this.chords.push(
-      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder()),
     );
     this.chords.push(
-      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder()),
     );
     this.chords.push(
-      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder()),
     );
     this.chords.push(
-      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder())
+      new AdditiveSynth(this.context, this.gain, chordRecorder.getRecorder()),
     );
 
     // Create drum machine
@@ -171,7 +167,7 @@ export class Controller {
     this.drumMachine = new DrumMachine(
       context,
       gain,
-      drumRecorder.getRecorder()
+      drumRecorder.getRecorder(),
     );
 
     // Create lead synth component
@@ -180,17 +176,19 @@ export class Controller {
     this.leadSynth = new FmSynth(
       this.context,
       this.gain,
-      leadRecorder.getRecorder()
+      leadRecorder.getRecorder(),
     );
     this.leadSynth.changeInstrument(this.preset);
 
     // Initial scale
-    this.scale = SCALES["acoustic"];
+    this.scale = SCALES.acoustic;
   }
 
   public evolve(data: number[]): void {
-    // Get chord
-    // this.scale = SCALES[this.scaleChain.next()];
+    /*
+     * Get chord
+     * this.scale = SCALES[this.scaleChain.next()];
+     */
 
     // Adjust transpose
     const notes = data.flatMap((val, index) => {
@@ -202,7 +200,7 @@ export class Controller {
         mtof(
           this.scale[index % this.scale.length] +
             48 +
-            12 * Math.floor(index / this.scale.length)
+            12 * Math.floor(index / this.scale.length),
         ),
       ];
     });
@@ -237,7 +235,7 @@ export class Controller {
     this.leadSynth.changeInstrument(this.preset);
   }
 
-  public drums(data: number[]) {
+  public drums(data: number[]): void {
     this.drumMachine.play(data);
   }
 

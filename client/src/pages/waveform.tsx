@@ -14,13 +14,14 @@ import { DotDraw } from "../components/DotDraw";
 import { useAudioContext } from "../hooks/useAudioContext";
 import { AdditiveSynth } from "../components/AdditiveSynth";
 import { Layout } from "../components/Layout";
+import { Seo } from "../components/Seo";
 
 const CANVAS_HEIGHT = 300;
 const DEFAULT_SAMPLES = 20;
 
 const getFourierPreset = (
-  type: "square" | "triangle" | "sawtooth" | "rectified" | "cosine",
-  size: number
+  type: "cosine" | "rectified" | "sawtooth" | "square" | "triangle",
+  size: number,
 ) => {
   const real = new Float32Array(size);
   const imag = new Float32Array(size);
@@ -34,7 +35,7 @@ const getFourierPreset = (
         break;
       case "triangle":
         if (i > 0) {
-          real[i] = 4 / Math.pow(i * Math.PI, 2);
+          real[i] = 4 / (i * Math.PI) ** 2;
         }
         break;
       case "sawtooth":
@@ -46,7 +47,7 @@ const getFourierPreset = (
         if (i === 0) {
           real[i] = 2 / Math.PI;
         } else {
-          real[i] = -4 / (Math.PI * (4 * Math.pow(Math.PI, 2) - 1));
+          real[i] = -4 / (Math.PI * (4 * Math.PI ** 2 - 1));
         }
         break;
       case "cosine":
@@ -71,8 +72,8 @@ const WaveformDraw: React.FC = () => {
     real: new Float32Array(DEFAULT_SAMPLES),
     imag: new Float32Array(DEFAULT_SAMPLES),
   }));
-  const [synth] = React.useState(() =>
-    context && gain ? new AdditiveSynth(context, gain) : null
+  const [synth, _setSynth] = React.useState(() =>
+    context && gain ? new AdditiveSynth(context, gain) : null,
   );
   const [freq, setFreq] = React.useState(440);
 
@@ -106,13 +107,18 @@ const WaveformDraw: React.FC = () => {
     }
 
     if (context.state === "suspended") {
-      context.resume();
+      context.resume().catch(console.error);
     }
+
     synth.play(freq);
   };
 
   return (
     <Layout>
+      <Typography variant="h1">Additive Synthesizer Waveform Draw</Typography>
+      <Typography variant="body1" style={{ marginBottom: 16 }}>
+        Draw a waveform and watch the oscilloscope!
+      </Typography>
       <Card>
         <Typography variant="h5">Real Component</Typography>
         <DotDraw
@@ -208,11 +214,11 @@ const WaveformDraw: React.FC = () => {
             style={{ marginBottom: 16 }}
             onChange={(event) => {
               const type = event.target.value as
-                | "square"
-                | "triangle"
-                | "sawtooth"
+                | "cosine"
                 | "rectified"
-                | "cosine";
+                | "sawtooth"
+                | "square"
+                | "triangle";
               setPoints(getFourierPreset(type, points.real.length));
             }}
             defaultValue=""
@@ -236,3 +242,7 @@ const WaveformDraw: React.FC = () => {
 };
 
 export default WaveformDraw;
+
+export const Head = (): JSX.Element => (
+  <Seo title="Waveform Draw" description="Draw a waveform!" />
+);

@@ -1,5 +1,5 @@
 export class SetInterval {
-  private fun: (elapsed: number) => void;
+  private readonly fun: (elapsed: number) => void;
 
   private stopped: boolean;
 
@@ -8,15 +8,15 @@ export class SetInterval {
     this.stopped = false;
   }
 
-  public start() {
+  public start(): void {
     requestAnimationFrame(this.callback.bind(this, Date.now()));
   }
 
-  public stop() {
+  public stop(): void {
     this.stopped = true;
   }
 
-  private callback(startTime: number) {
+  private callback(startTime: number): void {
     const elapsed = Date.now() - startTime;
     this.fun(elapsed);
     if (!this.stopped) {

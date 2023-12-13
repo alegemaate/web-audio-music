@@ -28,10 +28,15 @@ module.exports = {
       },
       resolve: "gatsby-plugin-typescript",
     },
+    {
+      resolve: "gatsby-plugin-sitemap",
+    },
   ],
   siteMetadata: {
     author: "alegemaate@gmail.com",
-    description: "Allan's Web Audio Playground",
+    description: "Try out the Web Audio API in your browser!",
     title: "Allan's Web Audio Playground",
+    siteUrl: "https://alegemaate.github.io/web-audio-music",
+    twitterUsername: "@alegemaate",
   },
 };

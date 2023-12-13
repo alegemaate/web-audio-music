@@ -14,14 +14,14 @@ export const Oscilloscope: React.FC<{
   }, [parentRef]);
 
   React.useEffect(() => {
-    const render = () => {
+    const render = (): number => {
       if (!oscRef.current) {
-        return;
+        return 0;
       }
 
       const ctx = oscRef.current.getContext("2d");
       if (!ctx) {
-        return;
+        return 0;
       }
 
       // Setup draw
@@ -35,14 +35,14 @@ export const Oscilloscope: React.FC<{
         ctx.moveTo(0, oscRef.current.height / 2);
         ctx.lineTo(oscRef.current.width, oscRef.current.height / 2);
         ctx.stroke();
-        return;
+        return 0;
       }
 
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
       analyser.getByteTimeDomainData(dataArray);
 
-      const sliceWidth = (oscRef.current.width * 1.0) / bufferLength;
+      const sliceWidth = Number(oscRef.current.width) / bufferLength;
       let x = 0;
       for (let i = 0; i < dataArray.length; i++) {
         const v = dataArray[i] / 128.0;

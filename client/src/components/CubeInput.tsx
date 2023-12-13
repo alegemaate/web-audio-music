@@ -1,10 +1,10 @@
 import React from "react";
 
-export type AccelParams = {
+export interface AccelParams {
   alpha: number;
   beta: number;
   gamma: number;
-};
+}
 
 const PI_360 = Math.PI / 360;
 
@@ -23,10 +23,10 @@ export const CubeInput: React.FC<{
   const rotationZ = React.useRef(0);
 
   const mouseMove = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    dragging: boolean
+    event: React.MouseEvent<HTMLDivElement>,
+    drag: boolean,
   ) => {
-    if (!dragging || !boardRef.current) {
+    if (!drag || !boardRef.current) {
       return;
     }
 
@@ -46,13 +46,13 @@ export const CubeInput: React.FC<{
     boardRef.current.style.transform = getTransform(
       rotationX.current,
       rotationY.current,
-      rotationZ.current
+      rotationZ.current,
     );
 
     onChange(
       Math.abs(Math.sin(rotationX.current * PI_360)),
       Math.abs(Math.sin(rotationY.current * PI_360)),
-      Math.abs(Math.sin(rotationZ.current * PI_360))
+      Math.abs(Math.sin(rotationZ.current * PI_360)),
     );
   };
 
@@ -60,9 +60,7 @@ export const CubeInput: React.FC<{
     setDragging(false);
   };
 
-  const handleMouseDown = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     setDragging(true);
     mouseMove(event, true);
   };
@@ -78,13 +76,13 @@ export const CubeInput: React.FC<{
     boardRef.current.style.transform = getTransform(
       rotationX.current,
       rotationY.current,
-      rotationZ.current
+      rotationZ.current,
     );
 
     onChange(
       Math.abs(Math.sin(rotationX.current * PI_360)),
       Math.abs(Math.sin(rotationY.current * PI_360)),
-      Math.abs(Math.sin(rotationZ.current * PI_360))
+      Math.abs(Math.sin(rotationZ.current * PI_360)),
     );
   };
 
@@ -101,13 +99,13 @@ export const CubeInput: React.FC<{
     boardRef.current.style.transform = getTransform(
       rotationX.current,
       rotationY.current,
-      rotationZ.current
+      rotationZ.current,
     );
 
     onChange(
       Math.abs(Math.sin(rotationX.current * PI_360)),
       Math.abs(Math.sin(rotationY.current * PI_360)),
-      Math.abs(Math.sin(rotationZ.current * PI_360))
+      Math.abs(Math.sin(rotationZ.current * PI_360)),
     );
   };
 
@@ -134,7 +132,9 @@ export const CubeInput: React.FC<{
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        onMouseMove={(event) => mouseMove(event, dragging)}
+        onMouseMove={(event) => {
+          mouseMove(event, dragging);
+        }}
         onWheel={handleScroll}
         onDoubleClick={reset}
       >

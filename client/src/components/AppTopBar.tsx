@@ -28,16 +28,14 @@ export const AppTopBar: React.FC<{
   url?: string;
 }> = ({ toggleDrawer, url, onDisconnect, onConnect }) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
-    null
+    null,
   );
 
   const classes = useStyles();
 
   const open = Boolean(anchorEl);
 
-  const handleOpen = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
+  const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 

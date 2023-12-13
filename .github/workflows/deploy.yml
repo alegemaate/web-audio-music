@@ -4,44 +4,54 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build:
     name: Deploy Site
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/configure-pages@v4
         with:
-          node-version: 14
+          static_site_generator: gatsby
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
           cache: yarn
 
-      - name: Caching Gatsby
-        id: gatsby-cache-build
-        uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
-            public
-            .cache
-          key: ${{ runner.os }}-gatsby-build-${{ github.run_id }}
+            ./client/public
+            ./client/.cache
+          key: ${{ runner.os }}-gatsby-build-${{ hashFiles('public') }}
           restore-keys: |
             ${{ runner.os }}-gatsby-build-
 
-      - name: Install Dependencies
-        run: yarn --frozen-lockfile
+      - run: yarn --frozen-lockfile
 
       - name: Build
         run: |
           cd client
           yarn build
         env:
-          CI: true
+          CI: "true"
+          PREFIX_PATHS: "true"
 
-      - name: Deploy to Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      - uses: actions/upload-pages-artifact@v2
         with:
-          branch: gh-pages
-          folder: client/public
-          single-commit: true
+          path: ./client/public
+
+      - uses: actions/deploy-pages@v3
+        id: deployment
