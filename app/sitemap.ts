@@ -17,7 +17,7 @@ const ROUTES = [
 
 const sitemap = (): MetadataRoute.Sitemap =>
   ROUTES.map((route) => ({
-    url: `${SITE_URL}${route}/`,
+    url: `${SITE_URL}${route}`,
     lastModified: new Date(),
   }));
 
